@@ -1,0 +1,28 @@
+{
+  "name": "Daoyu Cheat - Real History Compatibility",
+  "id": "diaoyu_cheat_real_history_compatibility",
+  "version": "1.0.0",
+  "game_id": "victoria3",
+  "picture": "thumbnail.png",
+  "supported_game_version": "1.13.*",
+  "short_description": "Compatibility patch for Daoyu Cheat and Realism Ai Historical Flavor Mod.",
+  "tags": [
+    "Events"
+  ],
+  "relationships": [
+    {
+      "rel_type": "dependency",
+      "id": "btking-daoyu",
+      "display_name": "Daoyu Cheat — Continued (BtKing)",
+      "resource_type": "mod",
+      "version": "*"
+    },
+    {
+      "rel_type": "dependency",
+      "id": "realism_ai_historical_flavor_mod",
+      "display_name": "Realism Ai Historical Flavor Mod",
+      "resource_type": "mod",
+      "version": "*"
+    }
+  ]
+}
