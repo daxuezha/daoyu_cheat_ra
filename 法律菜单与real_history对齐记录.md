@@ -1,4 +1,4 @@
-# `diaoyu_cheat` 法律菜单与 `real_history` 对齐记录
+# `daoyu_cheat` 法律菜单与 `real_history` 对齐记录
 
 ## 法律选项怎样走到生效
 
@@ -147,8 +147,13 @@ Mod 元数据位于 `.metadata/metadata.json`，依赖通过 `relationships` 中
 
 - 初版错误使用根目录 `descriptor.mod`，并以名称写入 `dependencies`；这不符合本次核对的 Victoria 3 Modding Wiki 本地 Mod 元数据格式。
 - 按 Wiki 的 `.metadata/metadata.json` 示例改为 JSON `relationships` 依赖对象；两个依赖 ID 分别从其 `.metadata/metadata.json` 读取。
-- 版本字段使用 `supported_game_version`，补丁自身 ID 固定为 `diaoyu_cheat_real_history_compatibility`，缩略图放在 `.metadata/thumbnail.png`。
+- 版本字段使用 `supported_game_version`，补丁自身 ID 固定为 `daoyu_cheat_ra`，缩略图放在 `.metadata/thumbnail.png`。
 - 格式依据：[Modding Wiki：Setting up the mod folder](https://vic3.paradoxwikis.com/Modding#Setting_up_the_mod_folder)、[Mod structure：Metadata](https://vic3.paradoxwikis.com/Mod_structure#Metadata)。Wiki 示例使用 `.metadata/metadata.json` 与 `relationships`；依赖关系以目标 Mod metadata ID 标识。
+
+### 工程名称拼写修正（2026-10-03）
+
+- 兼容补丁名称统一使用 `Daoyu` / `daoyu`，对应工程目录和 GitHub 仓库 `daoyu_cheat_ra`；此前误写的 `diaoyu` 已从本补丁自身 metadata ID 与文档标题中修正。
+- 基础 Mod 的实际依赖 ID `btking-daoyu` 保持不变；这是基础 Mod 自身的 metadata ID，不随本兼容补丁仓库更名。
 
 ## 核对结果
 
