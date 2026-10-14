@@ -3362,23 +3362,22 @@ daoyu.220 = {
 		if = { limit = { has_global_variable = daoyu_filter_army } remove_global_variable = daoyu_filter_army }
 		if = { limit = { has_global_variable = daoyu_filter_fleet } remove_global_variable = daoyu_filter_fleet }
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 	}
-	#【兼容补丁新增】成为利益集团领袖：参考原版 set_as_interest_group_leader 与 real_history 的 roc_republic2 决议
+	#【兼容补丁新增】指定政治运动：为鼓动者选择其可参加的政治运动
 	option = {
-		name = daoyu_set_character_as_ig_leader#成为利益集团领袖
+		name = daoyu_ra_assign_movement#指定政治运动
 		trigger = {
 			exists = scope:daoyu_target_character
-			exists = scope:daoyu_target_character.interest_group
 			scope:daoyu_target_character = {
 				has_trait = daoyu_target_character
-				is_character_alive = yes
-				is_in_exile_pool = no
-				is_interest_group_leader = no
+				is_ruler = no
+				is_heir = no
 			}
 		}
-		set_global_variable = daoyu_set_character_as_ig_leader
-		hidden_effect = { trigger_event = { id = daoyu.222 popup = yes } }
+		scope:daoyu_target_character = { save_scope_as = daoyu_ra_mv_character }
+		save_scope_as = daoyu_ra_mv_country
+		daoyu_ra_assign_movement_effect = yes
 	}
 	option = {
 		name = SET_CHARACTER_AS_RULER#成为统治者
@@ -3560,7 +3559,6 @@ daoyu.222 = {
 	flavor = {
 		first_valid = { desc = daoyu_target_character_get_name }
 		first_valid = { triggered_desc = { trigger = { has_global_variable = daoyu_set_character_as_ruler } } desc = SET_CHARACTER_AS_RULER }
-		first_valid = { triggered_desc = { trigger = { has_global_variable = daoyu_set_character_as_ig_leader } } desc = daoyu_set_character_as_ig_leader }
 		first_valid = { triggered_desc = { trigger = { has_global_variable = daoyu_exile_character } } desc = oncept_exile }
 	}
 	event_image = { video = "gfx/event_pictures/europenorthamerica_capitalists_meeting.bk2" }
@@ -3570,12 +3568,7 @@ daoyu.222 = {
 	duration = 0
 	immediate = {
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
-	}
-	option = {
-		name = CONFIRM
-		trigger = { has_global_variable = daoyu_set_character_as_ig_leader exists = scope:daoyu_target_character exists = scope:daoyu_target_character.interest_group scope:daoyu_target_character = { has_trait = daoyu_target_character } }
-		scope:daoyu_target_character = { set_as_interest_group_leader = yes }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 	}
 	option = {
 		name = CONFIRM
@@ -3592,7 +3585,6 @@ daoyu.222 = {
 		default_option = yes
 	}
 	after = {
-		remove_global_variable = daoyu_set_character_as_ig_leader
 		remove_global_variable = daoyu_set_character_as_ruler
 		remove_global_variable = daoyu_exile_character
 		trigger_event = { id = daoyu.220 popup = yes }
@@ -3620,7 +3612,7 @@ daoyu.221 = {
 	duration = 0
 	immediate = {
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 		random_character = { limit = { has_trait = daoyu_target_character } interest_group = { save_scope_as = daoyu_target_ig } }
 		# btking 2026-08-26: bare limits wrapped (X-13 - sites Xier missed)
 		scope:daoyu_target_ig = { if = { limit = { has_global_variable = daoyu_interest_group_approval } remove_modifier = daoyu_interest_group_approval } }
@@ -3712,7 +3704,7 @@ daoyu.229 = {
 	duration = 0
 	immediate = {
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 	}
 	option = {
 		name = ig_armed_forces
@@ -3778,7 +3770,7 @@ daoyu.230 = {
 	duration = 0
 	immediate = {
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 	}
 	option = {
 		name = catholic#天主教
@@ -3872,7 +3864,7 @@ daoyu.240 = {
 	immediate = {
 		remove_global_variable = daoyu_create_general remove_global_variable = daoyu_create_admiral remove_global_variable = daoyu_create_politician
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 	}
 	option = {
 		name = daoyu_remove_trait
@@ -3928,7 +3920,7 @@ daoyu.241 = {
 	duration = 0
 	immediate = {
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 	}
 	option = { name = daoyu_shot_in_the_right_ear trigger = { scope:daoyu_target_character = { has_trait = daoyu_shot_in_the_right_ear } } scope:daoyu_target_character = { remove_trait = daoyu_shot_in_the_right_ear } }
 	option = { name = daoyu_entrepreneur trigger = { scope:daoyu_target_character = { has_trait = daoyu_entrepreneur } } scope:daoyu_target_character = { remove_trait = daoyu_entrepreneur } }
@@ -4215,7 +4207,7 @@ daoyu.244 = {
 	duration = 0
 	immediate = {
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 	}
 	option = {
 		name = daoyu_remove_all
@@ -4318,7 +4310,7 @@ daoyu.250 = {
 	duration = 0
 	immediate = {
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 		daoyu_count_character_ideology_effect = yes
 	}
 	option = { name = ONLY_SHOW_AVAILABLE trigger = { nor = { has_variable = daoyu_show_available has_variable = daoyu_show_more } } set_variable = daoyu_show_available set_variable = daoyu_page_01 }
@@ -4373,9 +4365,58 @@ daoyu.250 = {
 	option = { name = ideology_bonapartist_movement trigger = { has_variable = daoyu_show_CI_ideology_bonapartist_movement } custom_tooltip = ideology_bonapartist_movement_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_bonapartist_movement } }
 	option = { name = ideology_national_liberal_movement trigger = { has_variable = daoyu_show_CI_ideology_national_liberal_movement } custom_tooltip = ideology_national_liberal_movement_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_national_liberal_movement } }
 	option = { name = ideology_integralist_movement trigger = { has_variable = daoyu_show_CI_ideology_integralist_movement } custom_tooltip = ideology_integralist_movement_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_integralist_movement } }
+	#【兼容补丁新增】Realism Ai Historical Flavor Mod 角色意识形态
+	option = { name = ideology_american_school_leader trigger = { has_variable = daoyu_show_CI_ideology_american_school_leader } custom_tooltip = ideology_american_school_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_american_school_leader } }
+	option = { name = ideology_Anti_feudalism trigger = { has_variable = daoyu_show_CI_ideology_Anti_feudalism } custom_tooltip = ideology_Anti_feudalism_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_Anti_feudalism } }
+	option = { name = ideology_austria_constitutionalist_leader trigger = { has_variable = daoyu_show_CI_ideology_austria_constitutionalist_leader } custom_tooltip = ideology_austria_constitutionalist_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_austria_constitutionalist_leader } }
+	option = { name = ideology_bavarocrat trigger = { has_variable = daoyu_show_CI_ideology_bavarocrat } custom_tooltip = ideology_bavarocrat_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_bavarocrat } }
+	option = { name = ideology_bismarckism trigger = { has_variable = daoyu_show_CI_ideology_bismarckism } custom_tooltip = ideology_bismarckism_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_bismarckism } }
+	option = { name = ideology_bukharinist trigger = { has_variable = daoyu_show_CI_ideology_bukharinist } custom_tooltip = ideology_bukharinist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_bukharinist } }
+	option = { name = ideology_capitalist_roader trigger = { has_variable = daoyu_show_CI_ideology_capitalist_roader } custom_tooltip = ideology_capitalist_roader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_capitalist_roader } }
+	option = { name = ideology_china_reformer trigger = { has_variable = daoyu_show_CI_ideology_china_reformer } custom_tooltip = ideology_china_reformer_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_china_reformer } }
+	option = { name = ideology_china_Westernization trigger = { has_variable = daoyu_show_CI_ideology_china_Westernization } custom_tooltip = ideology_china_Westernization_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_china_Westernization } }
+	option = { name = ideology_chinaempire trigger = { has_variable = daoyu_show_CI_ideology_chinaempire } custom_tooltip = ideology_chinaempire_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_chinaempire } }
+	option = { name = ideology_classical_conservatism_leader trigger = { has_variable = daoyu_show_CI_ideology_classical_conservatism_leader } custom_tooltip = ideology_classical_conservatism_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_classical_conservatism_leader } }
+	option = { name = ideology_Cultural_diversity_leader trigger = { has_variable = daoyu_show_CI_ideology_Cultural_diversity_leader } custom_tooltip = ideology_Cultural_diversity_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_Cultural_diversity_leader } }
+	option = { name = ideology_dacianist trigger = { has_variable = daoyu_show_CI_ideology_dacianist } custom_tooltip = ideology_dacianist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_dacianist } }
+	option = { name = ideology_dazheng trigger = { has_variable = daoyu_show_CI_ideology_dazheng } custom_tooltip = ideology_dazheng_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_dazheng } }
+	option = { name = ideology_grefm_constitutionalist trigger = { has_variable = daoyu_show_CI_ideology_grefm_constitutionalist } custom_tooltip = ideology_grefm_constitutionalist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_grefm_constitutionalist } }
+	option = { name = ideology_junimist trigger = { has_variable = daoyu_show_CI_ideology_junimist } custom_tooltip = ideology_junimist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_junimist } }
+	option = { name = ideology_kogalnitchanism trigger = { has_variable = daoyu_show_CI_ideology_kogalnitchanism } custom_tooltip = ideology_kogalnitchanism_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_kogalnitchanism } }
+	option = { name = ideology_Liberators trigger = { has_variable = daoyu_show_CI_ideology_Liberators } custom_tooltip = ideology_Liberators_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_Liberators } }
+	option = { name = ideology_maoist trigger = { has_variable = daoyu_show_CI_ideology_maoist } custom_tooltip = ideology_maoist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_maoist } }
+	option = { name = ideology_market_anarchist trigger = { has_variable = daoyu_show_CI_ideology_market_anarchist } custom_tooltip = ideology_market_anarchist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_market_anarchist } }
+	option = { name = ideology_market_oligarch trigger = { has_variable = daoyu_show_CI_ideology_market_oligarch } custom_tooltip = ideology_market_oligarch_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_market_oligarch } }
+	option = { name = ideology_meiji trigger = { has_variable = daoyu_show_CI_ideology_meiji } custom_tooltip = ideology_meiji_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_meiji } }
+	option = { name = ideology_moderado trigger = { has_variable = daoyu_show_CI_ideology_moderado } custom_tooltip = ideology_moderado_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_moderado } }
+	option = { name = ideology_modern_conservatism_leader trigger = { has_variable = daoyu_show_CI_ideology_modern_conservatism_leader } custom_tooltip = ideology_modern_conservatism_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_modern_conservatism_leader } }
+	option = { name = ideology_modernizer_leader_ra trigger = { has_variable = daoyu_show_CI_ideology_modernizer_leader_ra } custom_tooltip = ideology_modernizer_leader_ra_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_modernizer_leader_ra } }
+	option = { name = ideology_nazi trigger = { has_variable = daoyu_show_CI_ideology_nazi } custom_tooltip = ideology_nazi_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_nazi } }
+	option = { name = ideology_neo_absolutism_leader trigger = { has_variable = daoyu_show_CI_ideology_neo_absolutism_leader } custom_tooltip = ideology_neo_absolutism_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_neo_absolutism_leader } }
+	option = { name = ideology_nordic_pan_nationalist trigger = { has_variable = daoyu_show_CI_ideology_nordic_pan_nationalist } custom_tooltip = ideology_nordic_pan_nationalist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_nordic_pan_nationalist } }
+	option = { name = ideology_polk_jingoist_leader trigger = { has_variable = daoyu_show_CI_ideology_polk_jingoist_leader } custom_tooltip = ideology_polk_jingoist_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_polk_jingoist_leader } }
+	option = { name = ideology_progresista trigger = { has_variable = daoyu_show_CI_ideology_progresista } custom_tooltip = ideology_progresista_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_progresista } }
+	option = { name = ideology_sanminzhuyi trigger = { has_variable = daoyu_show_CI_ideology_sanminzhuyi } custom_tooltip = ideology_sanminzhuyi_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_sanminzhuyi } }
+	option = { name = ideology_social_corporations trigger = { has_variable = daoyu_show_CI_ideology_social_corporations } custom_tooltip = ideology_social_corporations_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_social_corporations } }
+	option = { name = ideology_sonno_kaikoku trigger = { has_variable = daoyu_show_CI_ideology_sonno_kaikoku } custom_tooltip = ideology_sonno_kaikoku_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_sonno_kaikoku } }
+	option = { name = ideology_titoist trigger = { has_variable = daoyu_show_CI_ideology_titoist } custom_tooltip = ideology_titoist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_titoist } }
+	option = { name = ideology_trotskyist trigger = { has_variable = daoyu_show_CI_ideology_trotskyist } custom_tooltip = ideology_trotskyist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_trotskyist } }
+	option = { name = ideology_ultraleftist trigger = { has_variable = daoyu_show_CI_ideology_ultraleftist } custom_tooltip = ideology_ultraleftist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_ultraleftist } }
+	option = { name = ideology_usfp_abolitionist_radical trigger = { has_variable = daoyu_show_CI_ideology_usfp_abolitionist_radical } custom_tooltip = ideology_usfp_abolitionist_radical_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_usfp_abolitionist_radical } }
+	option = { name = ideology_usfp_georgist_leader trigger = { has_variable = daoyu_show_CI_ideology_usfp_georgist_leader } custom_tooltip = ideology_usfp_georgist_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_usfp_georgist_leader } }
+	option = { name = ideology_usfp_pan_indianist trigger = { has_variable = daoyu_show_CI_ideology_usfp_pan_indianist } custom_tooltip = ideology_usfp_pan_indianist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_usfp_pan_indianist } }
+	option = { name = ideology_usfp_progressive trigger = { has_variable = daoyu_show_CI_ideology_usfp_progressive } custom_tooltip = ideology_usfp_progressive_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_usfp_progressive } }
+	option = { name = ideology_usfp_progressive_movement trigger = { has_variable = daoyu_show_CI_ideology_usfp_progressive_movement } custom_tooltip = ideology_usfp_progressive_movement_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_usfp_progressive_movement } }
+	option = { name = ideology_usfp_social_darwinist_leader trigger = { has_variable = daoyu_show_CI_ideology_usfp_social_darwinist_leader } custom_tooltip = ideology_usfp_social_darwinist_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_usfp_social_darwinist_leader } }
+	option = { name = ideology_usfp_social_gospel_leader trigger = { has_variable = daoyu_show_CI_ideology_usfp_social_gospel_leader } custom_tooltip = ideology_usfp_social_gospel_leader_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_usfp_social_gospel_leader } }
+	option = { name = ideology_usfp_strongman_populist trigger = { has_variable = daoyu_show_CI_ideology_usfp_strongman_populist } custom_tooltip = ideology_usfp_strongman_populist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_usfp_strongman_populist } }
+	option = { name = ideology_usfp_universalist trigger = { has_variable = daoyu_show_CI_ideology_usfp_universalist } custom_tooltip = ideology_usfp_universalist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_usfp_universalist } }
+	option = { name = ideology_venizelist trigger = { has_variable = daoyu_show_CI_ideology_venizelist } custom_tooltip = ideology_venizelist_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_venizelist } }
+	option = { name = ideology_venizelos trigger = { has_variable = daoyu_show_CI_ideology_venizelos } custom_tooltip = ideology_venizelos_desc scope:daoyu_target_character = { set_ideology = ideology:ideology_venizelos } }
+	option = { name = ra_ideology_jingshi_republicanism trigger = { has_variable = daoyu_show_CI_ra_ideology_jingshi_republicanism } custom_tooltip = ra_ideology_jingshi_republicanism_desc scope:daoyu_target_character = { set_ideology = ideology:ra_ideology_jingshi_republicanism } }
 	option = {
 		name = NEXT_PAGE#下一页
-		trigger = { or = { has_variable = daoyu_show_available has_variable = daoyu_show_more } daoyu_check_page_next = yes }
+		trigger = { or = { has_variable = daoyu_show_available has_variable = daoyu_show_more } daoyu_ra_check_page_next_ci = yes }
 		daoyu_determine_page_next = yes
 	}
 	option = {
@@ -4410,7 +4451,7 @@ daoyu.260 = {
 	on_created_soundeffect = "event:/SFX/UI/Alerts/event_appear"
 	icon = "gfx/interface/icons/event_icons/event_skull.dds"
 	duration = 0
-	immediate = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+	immediate = { if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 	}
 	option = {
 		name = assassination_events.8.a
@@ -4753,7 +4794,7 @@ daoyu.281 = {
 	duration = 0
 	immediate = {
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character }
+		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 		if = { limit = { has_variable = daoyu_generals_orders } scope:daoyu_target_country = { every_scope_general = { daoyu_remove_personality_traits = yes } } }
 		if = { limit = { has_variable = daoyu_admirals_orders } scope:daoyu_target_country = { every_scope_admiral = { daoyu_remove_personality_traits = yes } } }
 	}
