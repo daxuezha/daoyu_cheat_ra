@@ -3362,22 +3362,153 @@ daoyu.220 = {
 		if = { limit = { has_global_variable = daoyu_filter_army } remove_global_variable = daoyu_filter_army }
 		if = { limit = { has_global_variable = daoyu_filter_fleet } remove_global_variable = daoyu_filter_fleet }
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
-		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
+		# 【兼容补丁新增】优先精确指向「本次点选的角色」。
+		# 基础 Mod 原有的随机回退完整保留，因此不改变原有行为。
+		if = { limit = { any_country = { has_variable = daoyu_target_country has_variable = daoyu_ra_targeted_character } } random_country = { limit = { has_variable = daoyu_target_country has_variable = daoyu_ra_targeted_character } var:daoyu_ra_targeted_character = { add_trait = daoyu_target_character save_scope_as = daoyu_target_character } } }
+		else_if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
+		else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
 	}
-	#【兼容补丁新增】指定政治运动：为鼓动者选择其可参加的政治运动
+	######################################################################
+	#【兼容补丁新增】以下都是「针对单人」的人员操作，集中在管理角色界面里。
+	#
+	# 右键菜单的分工（与原版保持一致，不新加互动项）：
+	#   · 本国角色：原版那套（流放异见分子 / 筹划意外 / 开启作弊 / 管理角色 /
+	#     招募将领 / 批量管理）完全不动，本补丁不往里加任何东西。
+	#   · 流亡角色：原版对流亡者本没有可用交互，本补丁只补两个 ——
+	#     「立即邀请」（新功能，置顶）与「筹划意外（流亡者版）」，
+	#     再加上原版的「管理角色」effect 分流后即可正常打开。
+	#
+	# 换句话说：所有新增的「人员补充 / 人员处置」功能都收进本事件，
+	# 只有「管理角色」一个入口，避免右键菜单被塞满。
+	######################################################################
+	# 转职：卸任现有职位，改为鼓动者（含鼓动者槽位检查）
+	option = {
+		name = daoyu_ra_convert_to_agitator#转为鼓动者
+		trigger = {
+			exists = scope:daoyu_target_character
+			scope:daoyu_target_character = {
+				has_trait = daoyu_target_character
+				daoyu_ra_can_convert_to_agitator_trigger = yes
+			}
+		}
+		set_variable = { name = daoyu_ra_mv_character value = scope:daoyu_target_character }
+		daoyu_ra_mv_convert_effect = yes
+		hidden_effect = { trigger_event = { id = daoyu.220 popup = yes } }
+	}
+	# 指定政治运动：可选择运动；非鼓动者会先自动转职
 	option = {
 		name = daoyu_ra_assign_movement#指定政治运动
 		trigger = {
 			exists = scope:daoyu_target_character
 			scope:daoyu_target_character = {
 				has_trait = daoyu_target_character
-				is_ruler = no
-				is_heir = no
+				daoyu_ra_can_assign_movement_trigger = yes
 			}
 		}
-		scope:daoyu_target_character = { save_scope_as = daoyu_ra_mv_character }
-		save_scope_as = daoyu_ra_mv_country
-		daoyu_ra_assign_movement_effect = yes
+		set_variable = { name = daoyu_ra_mv_character value = scope:daoyu_target_character }
+		daoyu_ra_mv_enter_effect = yes
+	}
+	# 招募：收为政治家
+	option = {
+		name = daoyu_ra_recruit_as_politician#招募为政治家
+		trigger = {
+			exists = scope:daoyu_target_character
+			scope:daoyu_target_character = {
+				has_trait = daoyu_target_character
+				daoyu_ra_can_recruit_trigger = yes
+				not = { has_role_of_type = politician }
+			}
+		}
+		set_variable = { name = daoyu_ra_mv_character value = scope:daoyu_target_character }
+		daoyu_ra_mv_recruit_politician_effect = yes
+		hidden_effect = { trigger_event = { id = daoyu.220 popup = yes } }
+	}
+	# 招募：收为陆军将领
+	option = {
+		name = daoyu_ra_recruit_as_general#招募为将领
+		trigger = {
+			exists = scope:daoyu_target_character
+			scope:daoyu_target_character = {
+				has_trait = daoyu_target_character
+				daoyu_ra_can_recruit_trigger = yes
+				not = { has_role_of_type = general }
+			}
+		}
+		set_variable = { name = daoyu_ra_mv_character value = scope:daoyu_target_character }
+		daoyu_ra_mv_recruit_general_effect = yes
+		hidden_effect = { trigger_event = { id = daoyu.220 popup = yes } }
+	}
+	# 招募：收为海军提督
+	option = {
+		name = daoyu_ra_recruit_as_admiral#招募为提督
+		trigger = {
+			exists = scope:daoyu_target_character
+			scope:daoyu_target_character = {
+				has_trait = daoyu_target_character
+				daoyu_ra_can_recruit_trigger = yes
+				not = { has_role_of_type = admiral }
+			}
+		}
+		set_variable = { name = daoyu_ra_mv_character value = scope:daoyu_target_character }
+		daoyu_ra_mv_recruit_admiral_effect = yes
+		hidden_effect = { trigger_event = { id = daoyu.220 popup = yes } }
+	}
+	# 授予 / 剥夺指挥权（只动职位，不把角色踢出人物池）
+	# 原版 retire_commander 会连带 retire_character_if_should_be_culled，
+	# 导致该角色之后在角色界面找不到、也不能操作；这里改用 add/remove_character_role。
+	option = {
+		name = daoyu_ra_grant_army_command#授予陆军指挥权
+		trigger = {
+			exists = scope:daoyu_target_character
+			scope:daoyu_target_character = {
+				has_trait = daoyu_target_character
+				is_adult = yes
+				is_ruler = no
+				not = { has_role_of_type = general }
+				or = { has_role_of_type = politician has_role_of_type = agitator }
+			}
+		}
+		scope:daoyu_target_character = { add_character_role = general }
+		hidden_effect = { trigger_event = { id = daoyu.220 popup = yes } }
+	}
+	option = {
+		name = daoyu_ra_remove_army_command#剥夺陆军指挥权
+		trigger = {
+			exists = scope:daoyu_target_character
+			scope:daoyu_target_character = { has_trait = daoyu_target_character has_role_of_type = general }
+		}
+		scope:daoyu_target_character = {
+			if = { limit = { exists = commander_military_formation } unassign_from_formation = yes }
+			remove_character_role = general
+		}
+		hidden_effect = { trigger_event = { id = daoyu.220 popup = yes } }
+	}
+	option = {
+		name = daoyu_ra_grant_navy_command#授予海军指挥权
+		trigger = {
+			exists = scope:daoyu_target_character
+			scope:daoyu_target_character = {
+				has_trait = daoyu_target_character
+				is_adult = yes
+				is_ruler = no
+				not = { has_role_of_type = admiral }
+				or = { has_role_of_type = politician has_role_of_type = agitator }
+			}
+		}
+		scope:daoyu_target_character = { add_character_role = admiral }
+		hidden_effect = { trigger_event = { id = daoyu.220 popup = yes } }
+	}
+	option = {
+		name = daoyu_ra_remove_navy_command#剥夺海军指挥权
+		trigger = {
+			exists = scope:daoyu_target_character
+			scope:daoyu_target_character = { has_trait = daoyu_target_character has_role_of_type = admiral }
+		}
+		scope:daoyu_target_character = {
+			if = { limit = { exists = commander_military_formation } unassign_from_formation = yes }
+			remove_character_role = admiral
+		}
+		hidden_effect = { trigger_event = { id = daoyu.220 popup = yes } }
 	}
 	#【兼容补丁新增】成为利益集团领袖：参考原版 set_as_interest_group_leader 与 real_history 的 roc_republic2 决议
 	option = {
@@ -3605,6 +3736,8 @@ daoyu.222 = {
 	option = {
 		name = RESIGN
 		default_option = yes
+		# 离开菜单时清掉精确目标，避免下次点开时残留
+		if = { limit = { has_variable = daoyu_ra_targeted_character } remove_variable = daoyu_ra_targeted_character }
 	}
 	after = {
 		remove_global_variable = daoyu_set_character_as_ig_leader

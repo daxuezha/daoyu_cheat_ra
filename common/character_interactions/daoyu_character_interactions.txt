@@ -1,3 +1,150 @@
+# 【邀请】立即邀请：流亡池中的鼓动者。
+#   先补齐鼓动者槽位，再绕过原版 5 年冷却把人请进来。
+#   本交互只负责「进槽位」；要指定运动请用「管理角色 → 指定政治运动」。
+#   放在文件最前是有意的：引擎按定义顺序渲染右键菜单，「立即邀请」因此排在最上方。
+daoyu_ra_invite_agitator_now = {
+	clicksound = "event:/SFX/DLC/1.3_ip1/UI/character_invite"
+	potential = {
+		is_in_exile_pool = yes
+		has_role_of_type = agitator
+		daoyu_ra_can_invite_trigger = yes
+	}
+	show_requirements = yes
+	show_confirmation_box = yes
+	effect = {
+		# scope:actor = 发起邀请的玩家国
+		scope:actor = { save_scope_as = daoyu_ra_mv_country }
+		daoyu_ra_invite_agitator_effect = yes
+	}
+}
+
+# 【筹划意外（流亡者版）】专门给流亡池角色的独立互动。
+#   为什么单独做一个：原版 daoyu_arrange_accident 的 potential 里有
+#   is_in_exile_pool = no，流亡者看不到它。为了**完全不动原版互动**，
+#   这里另起一个只对 is_in_exile_pool = yes 成立的同名功能。
+#
+#   对流亡者而言「流放」没有意义（他已经在流亡池里），所以本补丁不为流亡者
+#   提供原版那个「流放异见分子」按钮，只给出「筹划意外」作为唯一的处置手段。
+#
+#   效果本体与原版完全一致：效果代码里只用到 this（角色），不依赖 owner，
+#   因此对流亡者天然可用（原版 exiles_events.txt 也直接对流亡角色 kill_character）。
+#   已知边界：is_immortal = yes 的角色会被引擎忽略（点了没反应），与原版一致。
+daoyu_ra_arrange_accident_exile = {
+	clicksound = "event:/SFX/DLC/1.3_ip1/UI/exile_character"
+	potential = {
+		is_in_exile_pool = yes
+		is_in_void = no
+		is_ruler = no
+		is_heir = no
+		not = { has_variable = daoyu_dead }
+		scope:actor ?= {
+			is_ai = no
+			has_global_variable = daoyu_on
+		}
+	}
+	show_requirements = yes
+	effect = {
+		custom_tooltip = { text = daoyu_arrange_accident_tt }
+		set_variable = daoyu_dead
+		kill_character = { hidden = yes }
+	}
+	show_confirmation_box = yes
+}
+
+# 【授予指挥权】政治家 / 鼓动者 -> 陆军将领
+#   原版只有 grant_command_to_ruler（统治者）与 grant_command_to_agitator（鼓动者），
+#   缺「政治家」这一路，且原版两个都不检查刀鱼是否开启。这里补齐四组「授予 / 剥夺」，
+#   让政治家与鼓动者都能针对性地加/去陆军将领或海军提督。
+#
+# 【关键】剥夺指挥权**不能**用原版的 retire_commander：
+#   它的 effect 里是 replace_character_roles = { remove = { general admiral } }
+#   再 retire_character_if_should_be_culled = yes，会把角色**直接淘汰出人物池**
+#   （表现就是「这个人之后在角色界面再也找不到、也不能操作了」）。
+#   本补丁改用 add_character_role / remove_character_role **只动这一个职位**，
+#   角色始终留在人物池里，可以在管理角色界面继续操作。
+#
+# 角色名一律裸写（不能带引号，否则静默失败）。
+daoyu_ra_grant_army_command = {
+	clicksound = "event:/SFX/UI/Military/command_grant"
+	potential = {
+		is_adult = yes
+		is_in_void = no
+		is_in_exile_pool = no
+		is_ruler_of_own_country = no
+		not = { has_role_of_type = general }
+		or = { has_role_of_type = politician has_role_of_type = agitator }
+		scope:actor ?= { is_ai = no has_global_variable = daoyu_on }
+	}
+	possible = {
+		is_female = no
+		owner ?= { exists = owner.capital.land_hq }
+	}
+	show_requirements = yes
+	effect = {
+		add_character_role = general
+	}
+}
+
+# 【剥夺指挥权】陆军将领 -> 仅移除将领职位（保留政治家 / 鼓动者身份，留在人物池）
+daoyu_ra_remove_army_command = {
+	clicksound = "event:/SFX/UI/Military/command_remove"
+	potential = {
+		has_role_of_type = general
+		is_ruler_of_own_country = no
+		scope:actor ?= { is_ai = no has_global_variable = daoyu_on }
+	}
+	possible = {
+		commander_military_formation ?= { is_mobilized = no }
+	}
+	show_requirements = yes
+	effect = {
+		if = { limit = { exists = commander_military_formation } unassign_from_formation = yes }
+		remove_character_role = general
+	}
+	show_confirmation_box = yes
+}
+
+# 【授予指挥权】政治家 / 鼓动者 -> 海军提督
+daoyu_ra_grant_navy_command = {
+	clicksound = "event:/SFX/UI/Military/command_grant"
+	potential = {
+		is_adult = yes
+		is_in_void = no
+		is_in_exile_pool = no
+		is_ruler_of_own_country = no
+		not = { has_role_of_type = admiral }
+		or = { has_role_of_type = politician has_role_of_type = agitator }
+		scope:actor ?= { is_ai = no has_global_variable = daoyu_on }
+	}
+	possible = {
+		is_female = no
+		owner ?= { exists = owner.capital.naval_hq }
+	}
+	show_requirements = yes
+	effect = {
+		add_character_role = admiral
+	}
+}
+
+# 【剥夺指挥权】海军提督 -> 仅移除提督职位（保留政治家 / 鼓动者身份，留在人物池）
+daoyu_ra_remove_navy_command = {
+	clicksound = "event:/SFX/UI/Military/command_remove"
+	potential = {
+		has_role_of_type = admiral
+		is_ruler_of_own_country = no
+		scope:actor ?= { is_ai = no has_global_variable = daoyu_on }
+	}
+	possible = {
+		commander_military_formation ?= { is_mobilized = no }
+	}
+	show_requirements = yes
+	effect = {
+		if = { limit = { exists = commander_military_formation } unassign_from_formation = yes }
+		remove_character_role = admiral
+	}
+	show_confirmation_box = yes
+}
+
 daoyu_exile_character = {
 	clicksound = "event:/SFX/DLC/1.3_ip1/UI/exile_character"
 	potential = {
@@ -224,7 +371,14 @@ daoyu_open_daoyu_cheat = {
 daoyu_interactions_manage_character = {
 	clicksound = "event:/SFX/DLC/1.3_ip1/UI/exile_character"
 	potential = {
-		owner ?= { is_ai = no }
+		# 【兼容补丁新增】?= 的语义是「作用域存在 且 满足条件」。
+		# 流亡池角色没有 owner，原来的 owner ?= { is_ai = no } 会返回假，
+		# 导致「管理角色」对流亡者根本不显示。这里补上 scope:actor 这条路径
+		# （流亡池场景下 scope:actor 就是发起国）。
+		or = {
+			owner ?= { is_ai = no }
+			scope:actor ?= { is_ai = no }
+		}
 		has_global_variable = daoyu_on
 		not = { has_variable = daoyu_dead }
 	}
@@ -243,13 +397,27 @@ daoyu_interactions_manage_character = {
 	effect = {
 		this = { add_trait = daoyu_target_character }
 		set_global_variable = daoyu_character_interactions
+		# 【兼容补丁新增】把「本次点选的角色」存成发起国上的变量（daoyu_ra_targeted_character），
+		# 让 daoyu.220 精确作用在这一个人身上。这只是把基础 Mod 原本的
+		#   random_character = { limit = { has_trait = daoyu_target_character } ... }
+		# 从「随机取一个带标签的角色」变成「就是我刚才点的这个」；
+		# 基础 Mod 的随机回退逻辑（daoyu.220 的 immediate）完整保留，故不改变原有行为。
+		save_scope_as = daoyu_ra_clicked_character
 		# 流亡池中的角色没有 owner，此时必须走 scope:actor（交互的发起国）
 		if = {
 			limit = { is_in_exile_pool = yes }
-			scope:actor = { set_variable = daoyu_target_country trigger_event = { id = daoyu.220 popup = yes } }
+			scope:actor = {
+				set_variable = daoyu_target_country
+				set_variable = { name = daoyu_ra_targeted_character value = scope:daoyu_ra_clicked_character }
+				trigger_event = { id = daoyu.220 popup = yes }
+			}
 		}
 		else = {
-			owner = { set_variable = daoyu_target_country trigger_event = { id = daoyu.220 popup = yes } }
+			owner = {
+				set_variable = daoyu_target_country
+				set_variable = { name = daoyu_ra_targeted_character value = scope:daoyu_ra_clicked_character }
+				trigger_event = { id = daoyu.220 popup = yes }
+			}
 		}
 	}
 }
@@ -347,94 +515,3 @@ daoyu_interactions_admirals_orders = {
 
 # 【邀请】立即邀请：流亡池中的鼓动者。
 #   先补齐鼓动者槽位，再绕过 5 年冷却把人请进来，并自动确保其有可参加的政治运动。
-daoyu_ra_invite_agitator_now = {
-	clicksound = "event:/SFX/DLC/1.3_ip1/UI/character_invite"
-	potential = {
-		is_in_exile_pool = yes
-		has_role_of_type = agitator
-		daoyu_ra_can_invite_trigger = yes
-	}
-	show_requirements = yes
-	show_confirmation_box = yes
-	effect = {
-		daoyu_ra_invite_agitator_effect = yes
-	}
-}
-
-# 【转职】把政治家 / 指挥官转为鼓动者（职位切换 + 鼓动者岗位检查）。
-daoyu_ra_convert_to_agitator = {
-	clicksound = "event:/SFX/DLC/1.3_ip1/UI/agitator_promote"
-	potential = {
-		is_ruler = no
-		is_heir = no
-		not = { has_role_of_type = agitator }
-		daoyu_ra_can_convert_to_agitator_trigger = yes
-	}
-	show_requirements = yes
-	effect = {
-		daoyu_ra_convert_to_agitator_effect = yes
-	}
-}
-
-# 【邀请】指定政治运动：鼓动者（含流亡池与国内在职）。
-# 非鼓动者会先做职位切换（招募/转职为鼓动者）再进入运动选择菜单。
-daoyu_ra_assign_movement = {
-	clicksound = "event:/SFX/DLC/1.3_ip1/UI/agitator_promote"
-	potential = {
-		is_ruler = no
-		is_heir = no
-		daoyu_ra_can_assign_movement_trigger = yes
-	}
-	show_requirements = yes
-	effect = {
-		# 已在 potential 中排除国家，故 scope:actor 即期望的东道国
-		save_scope_as = daoyu_ra_mv_character
-		scope:actor = { save_scope_as = daoyu_ra_mv_country }
-		daoyu_ra_assign_movement_effect = yes
-	}
-}
-
-# 【招募】收为政治人物。
-daoyu_ra_recruit_as_politician = {
-	clicksound = "event:/SFX/DLC/1.3_ip1/UI/exile_character"
-	potential = {
-		is_ruler = no
-		is_heir = no
-		not = { has_role_of_type = politician }
-		daoyu_ra_can_recruit_trigger = yes
-	}
-	show_requirements = yes
-	effect = {
-		daoyu_ra_recruit_role_effect = { ROLE = "politician" }
-	}
-}
-
-# 【招募】收为指挥官。
-daoyu_ra_recruit_as_general = {
-	clicksound = "event:/SFX/UI/Military/command_grant"
-	potential = {
-		is_ruler = no
-		is_heir = no
-		not = { has_role_of_type = general }
-		daoyu_ra_can_recruit_trigger = yes
-	}
-	show_requirements = yes
-	effect = {
-		daoyu_ra_recruit_role_effect = { ROLE = "general" }
-	}
-}
-
-# 【招募】收为海军将领。
-daoyu_ra_recruit_as_admiral = {
-	clicksound = "event:/SFX/UI/Military/command_grant"
-	potential = {
-		is_ruler = no
-		is_heir = no
-		not = { has_role_of_type = admiral }
-		daoyu_ra_can_recruit_trigger = yes
-	}
-	show_requirements = yes
-	effect = {
-		daoyu_ra_recruit_role_effect = { ROLE = "admiral" }
-	}
-}

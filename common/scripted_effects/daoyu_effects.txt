@@ -2308,208 +2308,1071 @@ daoyu_ra_single_character_ideology = {
 #---------------------------------------------------------------------------
 
 # 确保某运动类型存在（已存在则跳过）。调用作用域：国家。
-daoyu_ra_ensure_movement = {
-	if = {
-		limit = { not = { any_political_movement = { is_political_movement_type = $MOVEMENT$ } } }
-		create_political_movement = { type = $MOVEMENT$ }
-	}
+
+#---------------------------------------------------------------------------
+# 政治运动：把「角色意识形态 -> 运动」的映射集中在这里
+# 数据来源：common/political_movements/*.txt 的 character_support_trigger。
+# 只有当某意识形态**单独**就能满足该运动的 character_support_trigger 时才可用；
+# 否则改了也没用（引擎仍判定该角色不能参加）。
+# 只改目标角色一人，绝不批量修改，避免把其他角色一起卷进运动。
+# 调用作用域：this = 角色。
+#---------------------------------------------------------------------------
+daoyu_ra_mv_ideology_map = {
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_anarchist } set_ideology = ideology:ideology_anarchist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_anti_slavery } set_ideology = ideology:ideology_abolitionist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_bonapartist } set_ideology = ideology:ideology_bonapartist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_carlist } set_ideology = ideology:ideology_traditionalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_communist } set_ideology = ideology:ideology_vanguardist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_corporatist } set_ideology = ideology:ideology_corporatist_leader }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_fascist } set_ideology = ideology:ideology_fascist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_feminist } set_ideology = ideology:ideology_feminist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_labor } set_ideology = ideology:ideology_reformer }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_land_reform } set_ideology = ideology:ideology_land_reformer }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_legitimist } set_ideology = ideology:ideology_legitimist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_liberal } set_ideology = ideology:ideology_market_liberal }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_meiji_restorationist } set_ideology = ideology:ideology_reformer }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_miguelist } set_ideology = ideology:ideology_traditionalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_minority_rights } set_ideology = ideology:ideology_humanitarian }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_modernizer } set_ideology = ideology:ideology_reformer }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_nihilist } set_ideology = ideology:ideology_nihilist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_orleanist } set_ideology = ideology:ideology_orleanist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_positivist } set_ideology = ideology:ideology_positivist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_pro_slavery } set_ideology = ideology:ideology_slaver }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_progresista } set_ideology = ideology:ideology_market_liberal }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_radical } set_ideology = ideology:ideology_radical }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_reactionary } set_ideology = ideology:ideology_traditionalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_royalist_absolutist } set_ideology = ideology:ideology_royalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_royalist_constitutional } set_ideology = ideology:ideology_royalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_socialist } set_ideology = ideology:ideology_communist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_tokugawa_loyalist } set_ideology = ideology:ideology_authoritarian }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_usfp_american_constitution } set_ideology = ideology:ideology_republican_leader }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_usfp_eugenics } set_ideology = ideology:ideology_usfp_social_darwinist_leader }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_usfp_neoconfederate } set_ideology = ideology:ideology_ethno_nationalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_usfp_progressive } set_ideology = ideology:ideology_usfp_progressive }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_utilitarian } set_ideology = ideology:ideology_utilitarian_leader }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_dominican_national } set_ideology = ideology:ideology_republican_leader }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_german_national } set_ideology = ideology:ideology_ethno_nationalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_india_pan_national } set_ideology = ideology:ideology_sovereignist_leader }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_italian_national } set_ideology = ideology:ideology_ethno_nationalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_scandinavia_pan_national } set_ideology = ideology:ideology_nordic_pan_nationalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_yugoslav_national } set_ideology = ideology:ideology_ethno_nationalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_cultural_minority } set_ideology = ideology:ideology_humanitarian }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_slave_revolt } set_ideology = ideology:ideology_abolitionist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_cultural_majority } set_ideology = ideology:ideology_fascist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_hindu_nationalist } set_ideology = ideology:ideology_theocrat }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_muslim_nationalist } set_ideology = ideology:ideology_theocrat }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_religious_majority } set_ideology = ideology:ideology_traditionalist }
+	if = { limit = { has_variable = daoyu_ra_mv_req_movement_religious_minority } set_ideology = ideology:ideology_traditionalist }
 }
 
-# 同上，但带上宗教与文化身份（宗教 / 文化 / 泛民族类运动需要）。调用作用域：国家。
-daoyu_ra_ensure_movement_ident = {
+#---------------------------------------------------------------------------
+# 为单个角色应用所需意识形态
+# 调用作用域：this = 角色；$MOVEMENT$ = 运动类型
+#---------------------------------------------------------------------------
+daoyu_ra_mv_apply_ideology_effect = {
+	# 调用作用域：this = 国家；scope:daoyu_target_character = 角色
 	if = {
-		limit = { not = { any_political_movement = { is_political_movement_type = $MOVEMENT$ } } }
-		create_political_movement = {
-			type = $MOVEMENT$
-			religion = scope:daoyu_ra_mv_religion
-			culture = scope:daoyu_ra_mv_culture
+		limit = { exists = scope:daoyu_target_character }
+		scope:daoyu_target_character = {
+			set_variable = daoyu_ra_mv_req_$MOVEMENT$
+			daoyu_ra_mv_ideology_map = yes
+			remove_variable = daoyu_ra_mv_req_$MOVEMENT$
 		}
 	}
 }
 
-# 按角色当前意识形态确保相配的运动存在。
-# 输入：this = 国家；scope:daoyu_ra_mv_character = 角色。
-daoyu_ra_create_suitable_movement_effect = {
-	scope:daoyu_ra_mv_character = {
-		religion = { save_scope_as = daoyu_ra_mv_religion }
-		culture = { save_scope_as = daoyu_ra_mv_culture }
-	}
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_Anti_feudalism } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_radical" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_Cultural_diversity_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_minority_rights" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_Liberators } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_progresista" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_abolitionist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_anti_slavery" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_american_school_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_liberal" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_anarchist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_anarchist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_austria_constitutionalist_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_royalist_constitutional" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_authoritarian } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_reactionary" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_bavarocrat } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_reactionary" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_bismarckism } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_fascist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_bonapartist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_bonapartist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_bonapartist_movement } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_bonapartist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_bukharinist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_communist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_capitalist_roader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_communist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_china_Westernization } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_modernizer" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_china_reformer } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_modernizer" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_chinaempire } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_cultural_majority" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_classical_conservatism_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_reactionary" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_communist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_communist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_corporatist_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_corporatist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_dacianist } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_cultural_minority" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_dazheng } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_fascist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_despotic_utopian } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_socialist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_ethno_nationalist } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_cultural_majority" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_fascist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_fascist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_feminist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_feminist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_grefm_constitutionalist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_progresista" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_humanitarian } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_anti_slavery" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_humanitarian_royalist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_progresista" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_integralist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_fascist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_integralist_movement } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_fascist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_jacksonian_democrat } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_pro_slavery" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_jingoist_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_meiji_restorationist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_junimist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_reactionary" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_kogalnitchanism } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_royalist_constitutional" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_land_reformer } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_land_reform" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_legitimist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_legitimist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_legitimist_movement } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_legitimist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_liberal_leader } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_dominican_national" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_luddite } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_land_reform" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_maoist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_communist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_market_anarchist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_liberal" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_market_liberal } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_dominican_national" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_market_oligarch } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_liberal" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_meiji } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_fascist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_moderado } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_progresista" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_moderate } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_progresista" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_modern_conservatism_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_reactionary" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_modernizer_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_modernizer" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_modernizer_leader_ra } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_modernizer" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_national_liberal_movement } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_liberal" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_nazi } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_fascist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_neo_absolutism_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_royalist_absolutist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_nihilist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_nihilist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_nordic_pan_nationalist } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_scandinavia_pan_national" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_orleanist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_orleanist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_orleanist_movement } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_orleanist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_pacifist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_progresista" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_polk_jingoist_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_liberal" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_positivist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_positivist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_progresista } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_progresista" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_protectionist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_meiji_restorationist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_radical } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_dominican_national" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_reformer } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_cultural_minority" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_republican_leader } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_dominican_national" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_royalist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_royalist_absolutist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_sanminzhuyi } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_cultural_majority" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_slaver } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_pro_slavery" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_social_corporations } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_liberal" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_social_democrat } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_india_pan_national" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_sonno_kaikoku } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_fascist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_sovereignist_leader } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_india_pan_national" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_theocrat } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_hindu_nationalist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_titoist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_communist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_traditionalist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_reactionary" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_traditionalist_minoritarian } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_religious_minority" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_trotskyist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_communist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_ultraleftist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_communist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_usfp_abolitionist_radical } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_anti_slavery" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_usfp_georgist_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_liberal" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_usfp_pan_indianist } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_india_pan_national" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_usfp_progressive } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_usfp_progressive" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_usfp_progressive_movement } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_liberal" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_usfp_social_darwinist_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_usfp_eugenics" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_usfp_social_gospel_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_usfp_progressive" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_usfp_strongman_populist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_usfp_neoconfederate" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_usfp_universalist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_liberal" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_utilitarian_leader } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_utilitarian" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_utopian } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_labor" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_vanguardist } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_communist" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_venizelist } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_cultural_minority" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ideology_venizelos } } daoyu_ra_ensure_movement_ident = { MOVEMENT = "movement_cultural_minority" } }
-	if = { limit = { scope:daoyu_ra_mv_character = { has_ideology = ideology:ra_ideology_jingshi_republicanism } } daoyu_ra_ensure_movement = { MOVEMENT = "movement_modernizer" } }
-}
-
 #---------------------------------------------------------------------------
-# 打开政治运动选择菜单。
-# 调用作用域：this = 目标角色，scope:actor = 玩家国。
-# 说明：事件 daoyu.292 是 country_event，this 在事件内会被重定向为国家，
-# 因此角色以国家变量 daoyu_ra_mv_target 传递进事件。
+# 自动匹配：按目标角色当前意识形态创建相配的运动并使其可参加
+# 调用作用域：this = 国家；scope:daoyu_target_character = 角色
 #---------------------------------------------------------------------------
-# 【邀请】指定政治运动（统一入口）
-# 鼓动者直接进入运动选择菜单；非鼓动者先做职位切换（含鼓动者槽位检查）再进入。
-# 调用作用域：this = 目标角色，scope:actor = 玩家国。
-#---------------------------------------------------------------------------
-daoyu_ra_assign_movement_effect = {
-	# 参数（由调用方预先设定）：
-	#   scope:daoyu_ra_mv_character = 目标角色；scope:daoyu_ra_mv_country = 邀请 / 招募国
+daoyu_ra_mv_auto_effect = {
+	# 调用作用域：this = 国家；scope:daoyu_target_character = 角色
+	# 按顺序找出第一个「角色意识形态已经满足」的运动并创建它；
+	# 用一个国家变量作为「已命中」标志，命中后不再继续创建。
+	scope:daoyu_target_character = { save_scope_as = daoyu_ra_mv_char }
+	scope:daoyu_target_character = { save_scope_as = daoyu_ra_mv_ident }
+	if = { limit = { has_variable = daoyu_ra_mv_done } remove_variable = daoyu_ra_mv_done }
 	if = {
-		limit = { not = { scope:daoyu_ra_mv_character = { has_role_of_type = agitator } } }
-		scope:daoyu_ra_mv_country = {
-			if = { limit = { empty_agitator_slots < 1 } add_modifier = { name = daoyu_country_agitator_slots_add days = 30 } }
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_anarchist }
 		}
-		scope:daoyu_ra_mv_character = {
-			if = { limit = { is_in_exile_pool = yes } transfer_character = scope:daoyu_ra_mv_country }
-			if = { limit = { is_in_exile_pool = yes } free_from_exile_effect = yes }
-			replace_character_roles = { remove = { politician general admiral } add = { agitator } }
-			add_career_length = { role = agitator months = 60 random_range = { 1.0 1.5 } }
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_anarchist } } }
+			create_political_movement = {
+				type = movement_anarchist
+			}
 		}
 	}
-	scope:daoyu_ra_mv_country = { daoyu_ra_create_suitable_movement_effect = yes }
-	daoyu_ra_open_movement_menu_effect = yes
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_abolitionist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_anti_slavery } } }
+			create_political_movement = {
+				type = movement_anti_slavery
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_bonapartist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_bonapartist } } }
+			create_political_movement = {
+				type = movement_bonapartist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_traditionalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_carlist } } }
+			create_political_movement = {
+				type = movement_carlist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_vanguardist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_communist } } }
+			create_political_movement = {
+				type = movement_communist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_corporatist_leader }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_corporatist } } }
+			create_political_movement = {
+				type = movement_corporatist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_fascist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_fascist } } }
+			create_political_movement = {
+				type = movement_fascist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_feminist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_feminist } } }
+			create_political_movement = {
+				type = movement_feminist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_reformer }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_labor } } }
+			create_political_movement = {
+				type = movement_labor
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_land_reformer }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_land_reform } } }
+			create_political_movement = {
+				type = movement_land_reform
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_legitimist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_legitimist } } }
+			create_political_movement = {
+				type = movement_legitimist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_market_liberal }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_liberal } } }
+			create_political_movement = {
+				type = movement_liberal
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_reformer }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_meiji_restorationist } } }
+			create_political_movement = {
+				type = movement_meiji_restorationist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_traditionalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_miguelist } } }
+			create_political_movement = {
+				type = movement_miguelist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_humanitarian }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_minority_rights } } }
+			create_political_movement = {
+				type = movement_minority_rights
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_reformer }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_modernizer } } }
+			create_political_movement = {
+				type = movement_modernizer
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_nihilist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_nihilist } } }
+			create_political_movement = {
+				type = movement_nihilist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_orleanist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_orleanist } } }
+			create_political_movement = {
+				type = movement_orleanist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_positivist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_positivist } } }
+			create_political_movement = {
+				type = movement_positivist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_slaver }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_pro_slavery } } }
+			create_political_movement = {
+				type = movement_pro_slavery
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_market_liberal }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_progresista } } }
+			create_political_movement = {
+				type = movement_progresista
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_radical }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_radical } } }
+			create_political_movement = {
+				type = movement_radical
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_traditionalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_reactionary } } }
+			create_political_movement = {
+				type = movement_reactionary
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_royalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_royalist_absolutist } } }
+			create_political_movement = {
+				type = movement_royalist_absolutist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_royalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_royalist_constitutional } } }
+			create_political_movement = {
+				type = movement_royalist_constitutional
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_communist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_socialist } } }
+			create_political_movement = {
+				type = movement_socialist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_authoritarian }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_tokugawa_loyalist } } }
+			create_political_movement = {
+				type = movement_tokugawa_loyalist
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_republican_leader }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_usfp_american_constitution } } }
+			create_political_movement = {
+				type = movement_usfp_american_constitution
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_usfp_social_darwinist_leader }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_usfp_eugenics } } }
+			create_political_movement = {
+				type = movement_usfp_eugenics
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_ethno_nationalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_usfp_neoconfederate } } }
+			create_political_movement = {
+				type = movement_usfp_neoconfederate
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_usfp_progressive }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_usfp_progressive } } }
+			create_political_movement = {
+				type = movement_usfp_progressive
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_utilitarian_leader }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_utilitarian } } }
+			create_political_movement = {
+				type = movement_utilitarian
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_republican_leader }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_dominican_national } } }
+			create_political_movement = {
+				type = movement_dominican_national
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_ethno_nationalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_german_national } } }
+			create_political_movement = {
+				type = movement_german_national
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_sovereignist_leader }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_india_pan_national } } }
+			create_political_movement = {
+				type = movement_india_pan_national
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_ethno_nationalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_italian_national } } }
+			create_political_movement = {
+				type = movement_italian_national
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_nordic_pan_nationalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_scandinavia_pan_national } } }
+			create_political_movement = {
+				type = movement_scandinavia_pan_national
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_ethno_nationalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_yugoslav_national } } }
+			create_political_movement = {
+				type = movement_yugoslav_national
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_humanitarian }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_cultural_minority } } }
+			create_political_movement = {
+				type = movement_cultural_minority
+				culture = scope:daoyu_ra_mv_ident.culture
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_abolitionist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_slave_revolt } } }
+			create_political_movement = {
+				type = movement_slave_revolt
+				culture = scope:daoyu_ra_mv_ident.culture
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_fascist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_cultural_majority } } }
+			create_political_movement = {
+				type = movement_cultural_majority
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_theocrat }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_hindu_nationalist } } }
+			create_political_movement = {
+				type = movement_hindu_nationalist
+				religion = scope:daoyu_ra_mv_ident.religion
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_theocrat }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_muslim_nationalist } } }
+			create_political_movement = {
+				type = movement_muslim_nationalist
+				religion = scope:daoyu_ra_mv_ident.religion
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_traditionalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_religious_majority } } }
+			create_political_movement = {
+				type = movement_religious_majority
+				religion = scope:daoyu_ra_mv_ident.religion
+			}
+		}
+	}
+	if = {
+		limit = {
+			not = { has_variable = daoyu_ra_mv_done }
+			scope:daoyu_ra_mv_char = { has_ideology = ideology:ideology_traditionalist }
+		}
+		set_variable = daoyu_ra_mv_done
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_religious_minority } } }
+			create_political_movement = {
+				type = movement_religious_minority
+				religion = scope:daoyu_ra_mv_ident.religion
+			}
+		}
+	}
+	if = { limit = { has_variable = daoyu_ra_mv_done } remove_variable = daoyu_ra_mv_done }
+}
+#---------------------------------------------------------------------------
+# 菜单分页（单热页标记，与基础 Mod 的 daoyu_determine_page_* 写法一致）
+#---------------------------------------------------------------------------
+daoyu_ra_mv_page_next = {
+	if = { limit = { has_variable = daoyu_ra_mv_page_01 } remove_variable = daoyu_ra_mv_page_01 set_variable = daoyu_ra_mv_page_02 }
+	else_if = { limit = { has_variable = daoyu_ra_mv_page_02 } remove_variable = daoyu_ra_mv_page_02 set_variable = daoyu_ra_mv_page_03 }
 }
 
+daoyu_ra_mv_page_prev = {
+	if = { limit = { has_variable = daoyu_ra_mv_page_03 } remove_variable = daoyu_ra_mv_page_03 set_variable = daoyu_ra_mv_page_02 }
+	else_if = { limit = { has_variable = daoyu_ra_mv_page_02 } remove_variable = daoyu_ra_mv_page_02 set_variable = daoyu_ra_mv_page_01 }
+}
+
+daoyu_ra_mv_page_exit = {
+	remove_variable = daoyu_ra_mv_page_01
+	remove_variable = daoyu_ra_mv_page_02
+	remove_variable = daoyu_ra_mv_page_03
+	remove_variable = daoyu_ra_mv_character
+}
+
+#---------------------------------------------------------------------------
+# 打开「指定政治运动」菜单
+# 调用作用域：this = 国家（玩家国），scope:daoyu_target_character = 角色
+#---------------------------------------------------------------------------
 daoyu_ra_open_movement_menu_effect = {
-	# 参数（由调用方预先设定）：
-	#   scope:daoyu_ra_mv_character = 目标角色；scope:daoyu_ra_mv_country = 事件宿主国
-	scope:daoyu_ra_mv_country = {
-		set_variable = daoyu_target_country
-		set_variable = { name = daoyu_ra_mv_target value = scope:daoyu_ra_mv_character }
-		set_global_variable = daoyu_ra_movement_menu
-		trigger_event = { id = daoyu.292 popup = yes }
-	}
+	# 若本次不是由事件携带而是直接调用，则用 scope:daoyu_target_character 重新写入变量
+	if = { limit = { exists = scope:daoyu_target_character } set_variable = { name = daoyu_ra_mv_character value = scope:daoyu_target_character } }
+	remove_variable = daoyu_ra_mv_page_01
+	remove_variable = daoyu_ra_mv_page_02
+	remove_variable = daoyu_ra_mv_page_03
+	trigger_event = { id = daoyu.292 popup = yes }
 }
 
-# 【邀请】立即邀请鼓动者
-# 绕过原版 invite_exile 的 5 年冷却（cooldown = normal_modifier_time = 1825 天）与 can_agitate 限制；
-# 本国鼓动者槽位不足时临时补 1 个。邀请 = 进入鼓动者槽位并参加政治运动。
-# 调用作用域：this = 目标角色（流亡池中的鼓动者），scope:actor = 邀请国。
 #---------------------------------------------------------------------------
+# 【邀请】立即邀请鼓动者（流亡池）
+# 绕过原版 invite_exile 的 5 年冷却（cooldown = normal_modifier_time = 1825 天）与 can_agitate；
+# 鼓动者槽位不足时临时补 1 个。邀请 = 进入鼓动者槽位并参加政治运动。
+# 调用作用域：this = 目标角色，scope:daoyu_ra_mv_country = 邀请国
+#---------------------------------------------------------------------------
+#---------------------------------------------------------------------------
+# 【邀请专用】临时意识形态切换
+#
+# 背景：原版 invite_exile 的 possible 里有 can_agitate = scope:actor，
+#   引擎要求「该角色在目标国至少能参加一个政治运动」才允许邀请。
+#   有些角色（例如 RA 的毛泽东，ideology = ideology_maoist）的意识形态
+#   不被任何运动的 character_support_trigger 接受，于是 can_agitate 不成立，
+#   邀请按钮点了不生效 —— 表现为「进不到鼓动者位置」。
+#
+# 做法：邀请前先把该角色临时改成「一定能参加运动」的意识形态，
+#   邀请完成后再**还原**成原来的意识形态。
+#
+# 【引擎限制】脚本没有读取角色当前意识形态的接口
+#   （Character.GetIdeology 只存在于 GUI 数据模型，脚本侧不可用），
+#   因此只能逐个 has_ideology 穷举：
+#     · daoyu_ra_save_ideology_effect  : 记住原意识形态，并换成保底意识形态
+#     · daoyu_ra_restore_ideology_effect: 按记住的标记还原
+#   保底意识形态用 ideology_communist —— 它同时被 movement_socialist
+#   与 movement_communist 接受，且这两个运动的 creation_trigger 要求最低。
+#---------------------------------------------------------------------------
+
+# 保存原意识形态 + 换成保底意识形态
+# 调用作用域：this = 角色
+daoyu_ra_save_ideology_effect = {
+	if = { limit = { has_variable = daoyu_ra_saved_ideology } remove_variable = daoyu_ra_saved_ideology }
+
+	if = { limit = { has_ideology = ideology:ideology_moderate } set_variable = daoyu_ra_saved_ideology_ideology_moderate }
+	if = { limit = { has_ideology = ideology:ideology_traditionalist } set_variable = daoyu_ra_saved_ideology_ideology_traditionalist }
+	if = { limit = { has_ideology = ideology:ideology_traditionalist_minoritarian } set_variable = daoyu_ra_saved_ideology_ideology_traditionalist_minoritarian }
+	if = { limit = { has_ideology = ideology:ideology_nihilist } set_variable = daoyu_ra_saved_ideology_ideology_nihilist }
+	if = { limit = { has_ideology = ideology:ideology_republican_leader } set_variable = daoyu_ra_saved_ideology_ideology_republican_leader }
+	if = { limit = { has_ideology = ideology:ideology_radical } set_variable = daoyu_ra_saved_ideology_ideology_radical }
+	if = { limit = { has_ideology = ideology:ideology_reformer } set_variable = daoyu_ra_saved_ideology_ideology_reformer }
+	if = { limit = { has_ideology = ideology:ideology_feminist } set_variable = daoyu_ra_saved_ideology_ideology_feminist }
+	if = { limit = { has_ideology = ideology:ideology_abolitionist } set_variable = daoyu_ra_saved_ideology_ideology_abolitionist }
+	if = { limit = { has_ideology = ideology:ideology_slaver } set_variable = daoyu_ra_saved_ideology_ideology_slaver }
+	if = { limit = { has_ideology = ideology:ideology_pacifist } set_variable = daoyu_ra_saved_ideology_ideology_pacifist }
+	if = { limit = { has_ideology = ideology:ideology_jingoist_leader } set_variable = daoyu_ra_saved_ideology_ideology_jingoist_leader }
+	if = { limit = { has_ideology = ideology:ideology_royalist } set_variable = daoyu_ra_saved_ideology_ideology_royalist }
+	if = { limit = { has_ideology = ideology:ideology_social_democrat } set_variable = daoyu_ra_saved_ideology_ideology_social_democrat }
+	if = { limit = { has_ideology = ideology:ideology_communist } set_variable = daoyu_ra_saved_ideology_ideology_communist }
+	if = { limit = { has_ideology = ideology:ideology_vanguardist } set_variable = daoyu_ra_saved_ideology_ideology_vanguardist }
+	if = { limit = { has_ideology = ideology:ideology_fascist } set_variable = daoyu_ra_saved_ideology_ideology_fascist }
+	if = { limit = { has_ideology = ideology:ideology_anarchist } set_variable = daoyu_ra_saved_ideology_ideology_anarchist }
+	if = { limit = { has_ideology = ideology:ideology_ethno_nationalist } set_variable = daoyu_ra_saved_ideology_ideology_ethno_nationalist }
+	if = { limit = { has_ideology = ideology:ideology_theocrat } set_variable = daoyu_ra_saved_ideology_ideology_theocrat }
+	if = { limit = { has_ideology = ideology:ideology_market_liberal } set_variable = daoyu_ra_saved_ideology_ideology_market_liberal }
+	if = { limit = { has_ideology = ideology:ideology_luddite } set_variable = daoyu_ra_saved_ideology_ideology_luddite }
+	if = { limit = { has_ideology = ideology:ideology_authoritarian } set_variable = daoyu_ra_saved_ideology_ideology_authoritarian }
+	if = { limit = { has_ideology = ideology:ideology_protectionist } set_variable = daoyu_ra_saved_ideology_ideology_protectionist }
+	if = { limit = { has_ideology = ideology:ideology_humanitarian } set_variable = daoyu_ra_saved_ideology_ideology_humanitarian }
+	if = { limit = { has_ideology = ideology:ideology_jacksonian_democrat } set_variable = daoyu_ra_saved_ideology_ideology_jacksonian_democrat }
+	if = { limit = { has_ideology = ideology:ideology_positivist } set_variable = daoyu_ra_saved_ideology_ideology_positivist }
+	if = { limit = { has_ideology = ideology:ideology_land_reformer } set_variable = daoyu_ra_saved_ideology_ideology_land_reformer }
+	if = { limit = { has_ideology = ideology:ideology_integralist } set_variable = daoyu_ra_saved_ideology_ideology_integralist }
+	if = { limit = { has_ideology = ideology:ideology_liberal_leader } set_variable = daoyu_ra_saved_ideology_ideology_liberal_leader }
+	if = { limit = { has_ideology = ideology:ideology_corporatist_leader } set_variable = daoyu_ra_saved_ideology_ideology_corporatist_leader }
+	if = { limit = { has_ideology = ideology:ideology_humanitarian_royalist } set_variable = daoyu_ra_saved_ideology_ideology_humanitarian_royalist }
+	if = { limit = { has_ideology = ideology:ideology_despotic_utopian } set_variable = daoyu_ra_saved_ideology_ideology_despotic_utopian }
+	if = { limit = { has_ideology = ideology:ideology_utilitarian_leader } set_variable = daoyu_ra_saved_ideology_ideology_utilitarian_leader }
+	if = { limit = { has_ideology = ideology:ideology_sovereignist_leader } set_variable = daoyu_ra_saved_ideology_ideology_sovereignist_leader }
+	if = { limit = { has_ideology = ideology:ideology_utopian } set_variable = daoyu_ra_saved_ideology_ideology_utopian }
+	if = { limit = { has_ideology = ideology:ideology_modernizer_leader } set_variable = daoyu_ra_saved_ideology_ideology_modernizer_leader }
+	if = { limit = { has_ideology = ideology:ideology_orleanist } set_variable = daoyu_ra_saved_ideology_ideology_orleanist }
+	if = { limit = { has_ideology = ideology:ideology_legitimist } set_variable = daoyu_ra_saved_ideology_ideology_legitimist }
+	if = { limit = { has_ideology = ideology:ideology_bonapartist } set_variable = daoyu_ra_saved_ideology_ideology_bonapartist }
+	if = { limit = { has_ideology = ideology:ideology_orleanist_movement } set_variable = daoyu_ra_saved_ideology_ideology_orleanist_movement }
+	if = { limit = { has_ideology = ideology:ideology_legitimist_movement } set_variable = daoyu_ra_saved_ideology_ideology_legitimist_movement }
+	if = { limit = { has_ideology = ideology:ideology_bonapartist_movement } set_variable = daoyu_ra_saved_ideology_ideology_bonapartist_movement }
+	if = { limit = { has_ideology = ideology:ideology_national_liberal_movement } set_variable = daoyu_ra_saved_ideology_ideology_national_liberal_movement }
+	if = { limit = { has_ideology = ideology:ideology_integralist_movement } set_variable = daoyu_ra_saved_ideology_ideology_integralist_movement }
+	if = { limit = { has_ideology = ideology:ideology_american_school_leader } set_variable = daoyu_ra_saved_ideology_ideology_american_school_leader }
+	if = { limit = { has_ideology = ideology:ideology_Anti_feudalism } set_variable = daoyu_ra_saved_ideology_ideology_Anti_feudalism }
+	if = { limit = { has_ideology = ideology:ideology_austria_constitutionalist_leader } set_variable = daoyu_ra_saved_ideology_ideology_austria_constitutionalist_leader }
+	if = { limit = { has_ideology = ideology:ideology_bavarocrat } set_variable = daoyu_ra_saved_ideology_ideology_bavarocrat }
+	if = { limit = { has_ideology = ideology:ideology_bismarckism } set_variable = daoyu_ra_saved_ideology_ideology_bismarckism }
+	if = { limit = { has_ideology = ideology:ideology_bukharinist } set_variable = daoyu_ra_saved_ideology_ideology_bukharinist }
+	if = { limit = { has_ideology = ideology:ideology_capitalist_roader } set_variable = daoyu_ra_saved_ideology_ideology_capitalist_roader }
+	if = { limit = { has_ideology = ideology:ideology_china_reformer } set_variable = daoyu_ra_saved_ideology_ideology_china_reformer }
+	if = { limit = { has_ideology = ideology:ideology_china_Westernization } set_variable = daoyu_ra_saved_ideology_ideology_china_Westernization }
+	if = { limit = { has_ideology = ideology:ideology_chinaempire } set_variable = daoyu_ra_saved_ideology_ideology_chinaempire }
+	if = { limit = { has_ideology = ideology:ideology_classical_conservatism_leader } set_variable = daoyu_ra_saved_ideology_ideology_classical_conservatism_leader }
+	if = { limit = { has_ideology = ideology:ideology_Cultural_diversity_leader } set_variable = daoyu_ra_saved_ideology_ideology_Cultural_diversity_leader }
+	if = { limit = { has_ideology = ideology:ideology_dacianist } set_variable = daoyu_ra_saved_ideology_ideology_dacianist }
+	if = { limit = { has_ideology = ideology:ideology_dazheng } set_variable = daoyu_ra_saved_ideology_ideology_dazheng }
+	if = { limit = { has_ideology = ideology:ideology_grefm_constitutionalist } set_variable = daoyu_ra_saved_ideology_ideology_grefm_constitutionalist }
+	if = { limit = { has_ideology = ideology:ideology_junimist } set_variable = daoyu_ra_saved_ideology_ideology_junimist }
+	if = { limit = { has_ideology = ideology:ideology_kogalnitchanism } set_variable = daoyu_ra_saved_ideology_ideology_kogalnitchanism }
+	if = { limit = { has_ideology = ideology:ideology_Liberators } set_variable = daoyu_ra_saved_ideology_ideology_Liberators }
+	if = { limit = { has_ideology = ideology:ideology_maoist } set_variable = daoyu_ra_saved_ideology_ideology_maoist }
+	if = { limit = { has_ideology = ideology:ideology_market_anarchist } set_variable = daoyu_ra_saved_ideology_ideology_market_anarchist }
+	if = { limit = { has_ideology = ideology:ideology_market_oligarch } set_variable = daoyu_ra_saved_ideology_ideology_market_oligarch }
+	if = { limit = { has_ideology = ideology:ideology_meiji } set_variable = daoyu_ra_saved_ideology_ideology_meiji }
+	if = { limit = { has_ideology = ideology:ideology_moderado } set_variable = daoyu_ra_saved_ideology_ideology_moderado }
+	if = { limit = { has_ideology = ideology:ideology_modern_conservatism_leader } set_variable = daoyu_ra_saved_ideology_ideology_modern_conservatism_leader }
+	if = { limit = { has_ideology = ideology:ideology_modernizer_leader_ra } set_variable = daoyu_ra_saved_ideology_ideology_modernizer_leader_ra }
+	if = { limit = { has_ideology = ideology:ideology_nazi } set_variable = daoyu_ra_saved_ideology_ideology_nazi }
+	if = { limit = { has_ideology = ideology:ideology_neo_absolutism_leader } set_variable = daoyu_ra_saved_ideology_ideology_neo_absolutism_leader }
+	if = { limit = { has_ideology = ideology:ideology_nordic_pan_nationalist } set_variable = daoyu_ra_saved_ideology_ideology_nordic_pan_nationalist }
+	if = { limit = { has_ideology = ideology:ideology_polk_jingoist_leader } set_variable = daoyu_ra_saved_ideology_ideology_polk_jingoist_leader }
+	if = { limit = { has_ideology = ideology:ideology_progresista } set_variable = daoyu_ra_saved_ideology_ideology_progresista }
+	if = { limit = { has_ideology = ideology:ideology_sanminzhuyi } set_variable = daoyu_ra_saved_ideology_ideology_sanminzhuyi }
+	if = { limit = { has_ideology = ideology:ideology_social_corporations } set_variable = daoyu_ra_saved_ideology_ideology_social_corporations }
+	if = { limit = { has_ideology = ideology:ideology_sonno_kaikoku } set_variable = daoyu_ra_saved_ideology_ideology_sonno_kaikoku }
+	if = { limit = { has_ideology = ideology:ideology_titoist } set_variable = daoyu_ra_saved_ideology_ideology_titoist }
+	if = { limit = { has_ideology = ideology:ideology_trotskyist } set_variable = daoyu_ra_saved_ideology_ideology_trotskyist }
+	if = { limit = { has_ideology = ideology:ideology_ultraleftist } set_variable = daoyu_ra_saved_ideology_ideology_ultraleftist }
+	if = { limit = { has_ideology = ideology:ideology_usfp_abolitionist_radical } set_variable = daoyu_ra_saved_ideology_ideology_usfp_abolitionist_radical }
+	if = { limit = { has_ideology = ideology:ideology_usfp_georgist_leader } set_variable = daoyu_ra_saved_ideology_ideology_usfp_georgist_leader }
+	if = { limit = { has_ideology = ideology:ideology_usfp_pan_indianist } set_variable = daoyu_ra_saved_ideology_ideology_usfp_pan_indianist }
+	if = { limit = { has_ideology = ideology:ideology_usfp_progressive } set_variable = daoyu_ra_saved_ideology_ideology_usfp_progressive }
+	if = { limit = { has_ideology = ideology:ideology_usfp_progressive_movement } set_variable = daoyu_ra_saved_ideology_ideology_usfp_progressive_movement }
+	if = { limit = { has_ideology = ideology:ideology_usfp_social_darwinist_leader } set_variable = daoyu_ra_saved_ideology_ideology_usfp_social_darwinist_leader }
+	if = { limit = { has_ideology = ideology:ideology_usfp_social_gospel_leader } set_variable = daoyu_ra_saved_ideology_ideology_usfp_social_gospel_leader }
+	if = { limit = { has_ideology = ideology:ideology_usfp_strongman_populist } set_variable = daoyu_ra_saved_ideology_ideology_usfp_strongman_populist }
+	if = { limit = { has_ideology = ideology:ideology_usfp_universalist } set_variable = daoyu_ra_saved_ideology_ideology_usfp_universalist }
+	if = { limit = { has_ideology = ideology:ideology_venizelist } set_variable = daoyu_ra_saved_ideology_ideology_venizelist }
+	if = { limit = { has_ideology = ideology:ideology_venizelos } set_variable = daoyu_ra_saved_ideology_ideology_venizelos }
+	if = { limit = { has_ideology = ideology:ra_ideology_jingshi_republicanism } set_variable = daoyu_ra_saved_ideology_ra_ideology_jingshi_republicanism }
+	# 换成保底意识形态：能同时被 movement_socialist / movement_communist 接受
+	set_ideology = ideology:ideology_communist
+}
+
+# 还原原意识形态
+# 调用作用域：this = 角色
+daoyu_ra_restore_ideology_effect = {
+
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_moderate } remove_variable = daoyu_ra_saved_ideology_ideology_moderate set_ideology = ideology:ideology_moderate }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_traditionalist } remove_variable = daoyu_ra_saved_ideology_ideology_traditionalist set_ideology = ideology:ideology_traditionalist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_traditionalist_minoritarian } remove_variable = daoyu_ra_saved_ideology_ideology_traditionalist_minoritarian set_ideology = ideology:ideology_traditionalist_minoritarian }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_nihilist } remove_variable = daoyu_ra_saved_ideology_ideology_nihilist set_ideology = ideology:ideology_nihilist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_republican_leader } remove_variable = daoyu_ra_saved_ideology_ideology_republican_leader set_ideology = ideology:ideology_republican_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_radical } remove_variable = daoyu_ra_saved_ideology_ideology_radical set_ideology = ideology:ideology_radical }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_reformer } remove_variable = daoyu_ra_saved_ideology_ideology_reformer set_ideology = ideology:ideology_reformer }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_feminist } remove_variable = daoyu_ra_saved_ideology_ideology_feminist set_ideology = ideology:ideology_feminist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_abolitionist } remove_variable = daoyu_ra_saved_ideology_ideology_abolitionist set_ideology = ideology:ideology_abolitionist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_slaver } remove_variable = daoyu_ra_saved_ideology_ideology_slaver set_ideology = ideology:ideology_slaver }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_pacifist } remove_variable = daoyu_ra_saved_ideology_ideology_pacifist set_ideology = ideology:ideology_pacifist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_jingoist_leader } remove_variable = daoyu_ra_saved_ideology_ideology_jingoist_leader set_ideology = ideology:ideology_jingoist_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_royalist } remove_variable = daoyu_ra_saved_ideology_ideology_royalist set_ideology = ideology:ideology_royalist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_social_democrat } remove_variable = daoyu_ra_saved_ideology_ideology_social_democrat set_ideology = ideology:ideology_social_democrat }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_communist } remove_variable = daoyu_ra_saved_ideology_ideology_communist set_ideology = ideology:ideology_communist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_vanguardist } remove_variable = daoyu_ra_saved_ideology_ideology_vanguardist set_ideology = ideology:ideology_vanguardist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_fascist } remove_variable = daoyu_ra_saved_ideology_ideology_fascist set_ideology = ideology:ideology_fascist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_anarchist } remove_variable = daoyu_ra_saved_ideology_ideology_anarchist set_ideology = ideology:ideology_anarchist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_ethno_nationalist } remove_variable = daoyu_ra_saved_ideology_ideology_ethno_nationalist set_ideology = ideology:ideology_ethno_nationalist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_theocrat } remove_variable = daoyu_ra_saved_ideology_ideology_theocrat set_ideology = ideology:ideology_theocrat }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_market_liberal } remove_variable = daoyu_ra_saved_ideology_ideology_market_liberal set_ideology = ideology:ideology_market_liberal }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_luddite } remove_variable = daoyu_ra_saved_ideology_ideology_luddite set_ideology = ideology:ideology_luddite }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_authoritarian } remove_variable = daoyu_ra_saved_ideology_ideology_authoritarian set_ideology = ideology:ideology_authoritarian }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_protectionist } remove_variable = daoyu_ra_saved_ideology_ideology_protectionist set_ideology = ideology:ideology_protectionist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_humanitarian } remove_variable = daoyu_ra_saved_ideology_ideology_humanitarian set_ideology = ideology:ideology_humanitarian }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_jacksonian_democrat } remove_variable = daoyu_ra_saved_ideology_ideology_jacksonian_democrat set_ideology = ideology:ideology_jacksonian_democrat }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_positivist } remove_variable = daoyu_ra_saved_ideology_ideology_positivist set_ideology = ideology:ideology_positivist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_land_reformer } remove_variable = daoyu_ra_saved_ideology_ideology_land_reformer set_ideology = ideology:ideology_land_reformer }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_integralist } remove_variable = daoyu_ra_saved_ideology_ideology_integralist set_ideology = ideology:ideology_integralist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_liberal_leader } remove_variable = daoyu_ra_saved_ideology_ideology_liberal_leader set_ideology = ideology:ideology_liberal_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_corporatist_leader } remove_variable = daoyu_ra_saved_ideology_ideology_corporatist_leader set_ideology = ideology:ideology_corporatist_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_humanitarian_royalist } remove_variable = daoyu_ra_saved_ideology_ideology_humanitarian_royalist set_ideology = ideology:ideology_humanitarian_royalist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_despotic_utopian } remove_variable = daoyu_ra_saved_ideology_ideology_despotic_utopian set_ideology = ideology:ideology_despotic_utopian }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_utilitarian_leader } remove_variable = daoyu_ra_saved_ideology_ideology_utilitarian_leader set_ideology = ideology:ideology_utilitarian_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_sovereignist_leader } remove_variable = daoyu_ra_saved_ideology_ideology_sovereignist_leader set_ideology = ideology:ideology_sovereignist_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_utopian } remove_variable = daoyu_ra_saved_ideology_ideology_utopian set_ideology = ideology:ideology_utopian }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_modernizer_leader } remove_variable = daoyu_ra_saved_ideology_ideology_modernizer_leader set_ideology = ideology:ideology_modernizer_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_orleanist } remove_variable = daoyu_ra_saved_ideology_ideology_orleanist set_ideology = ideology:ideology_orleanist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_legitimist } remove_variable = daoyu_ra_saved_ideology_ideology_legitimist set_ideology = ideology:ideology_legitimist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_bonapartist } remove_variable = daoyu_ra_saved_ideology_ideology_bonapartist set_ideology = ideology:ideology_bonapartist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_orleanist_movement } remove_variable = daoyu_ra_saved_ideology_ideology_orleanist_movement set_ideology = ideology:ideology_orleanist_movement }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_legitimist_movement } remove_variable = daoyu_ra_saved_ideology_ideology_legitimist_movement set_ideology = ideology:ideology_legitimist_movement }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_bonapartist_movement } remove_variable = daoyu_ra_saved_ideology_ideology_bonapartist_movement set_ideology = ideology:ideology_bonapartist_movement }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_national_liberal_movement } remove_variable = daoyu_ra_saved_ideology_ideology_national_liberal_movement set_ideology = ideology:ideology_national_liberal_movement }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_integralist_movement } remove_variable = daoyu_ra_saved_ideology_ideology_integralist_movement set_ideology = ideology:ideology_integralist_movement }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_american_school_leader } remove_variable = daoyu_ra_saved_ideology_ideology_american_school_leader set_ideology = ideology:ideology_american_school_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_Anti_feudalism } remove_variable = daoyu_ra_saved_ideology_ideology_Anti_feudalism set_ideology = ideology:ideology_Anti_feudalism }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_austria_constitutionalist_leader } remove_variable = daoyu_ra_saved_ideology_ideology_austria_constitutionalist_leader set_ideology = ideology:ideology_austria_constitutionalist_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_bavarocrat } remove_variable = daoyu_ra_saved_ideology_ideology_bavarocrat set_ideology = ideology:ideology_bavarocrat }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_bismarckism } remove_variable = daoyu_ra_saved_ideology_ideology_bismarckism set_ideology = ideology:ideology_bismarckism }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_bukharinist } remove_variable = daoyu_ra_saved_ideology_ideology_bukharinist set_ideology = ideology:ideology_bukharinist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_capitalist_roader } remove_variable = daoyu_ra_saved_ideology_ideology_capitalist_roader set_ideology = ideology:ideology_capitalist_roader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_china_reformer } remove_variable = daoyu_ra_saved_ideology_ideology_china_reformer set_ideology = ideology:ideology_china_reformer }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_china_Westernization } remove_variable = daoyu_ra_saved_ideology_ideology_china_Westernization set_ideology = ideology:ideology_china_Westernization }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_chinaempire } remove_variable = daoyu_ra_saved_ideology_ideology_chinaempire set_ideology = ideology:ideology_chinaempire }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_classical_conservatism_leader } remove_variable = daoyu_ra_saved_ideology_ideology_classical_conservatism_leader set_ideology = ideology:ideology_classical_conservatism_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_Cultural_diversity_leader } remove_variable = daoyu_ra_saved_ideology_ideology_Cultural_diversity_leader set_ideology = ideology:ideology_Cultural_diversity_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_dacianist } remove_variable = daoyu_ra_saved_ideology_ideology_dacianist set_ideology = ideology:ideology_dacianist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_dazheng } remove_variable = daoyu_ra_saved_ideology_ideology_dazheng set_ideology = ideology:ideology_dazheng }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_grefm_constitutionalist } remove_variable = daoyu_ra_saved_ideology_ideology_grefm_constitutionalist set_ideology = ideology:ideology_grefm_constitutionalist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_junimist } remove_variable = daoyu_ra_saved_ideology_ideology_junimist set_ideology = ideology:ideology_junimist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_kogalnitchanism } remove_variable = daoyu_ra_saved_ideology_ideology_kogalnitchanism set_ideology = ideology:ideology_kogalnitchanism }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_Liberators } remove_variable = daoyu_ra_saved_ideology_ideology_Liberators set_ideology = ideology:ideology_Liberators }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_maoist } remove_variable = daoyu_ra_saved_ideology_ideology_maoist set_ideology = ideology:ideology_maoist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_market_anarchist } remove_variable = daoyu_ra_saved_ideology_ideology_market_anarchist set_ideology = ideology:ideology_market_anarchist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_market_oligarch } remove_variable = daoyu_ra_saved_ideology_ideology_market_oligarch set_ideology = ideology:ideology_market_oligarch }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_meiji } remove_variable = daoyu_ra_saved_ideology_ideology_meiji set_ideology = ideology:ideology_meiji }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_moderado } remove_variable = daoyu_ra_saved_ideology_ideology_moderado set_ideology = ideology:ideology_moderado }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_modern_conservatism_leader } remove_variable = daoyu_ra_saved_ideology_ideology_modern_conservatism_leader set_ideology = ideology:ideology_modern_conservatism_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_modernizer_leader_ra } remove_variable = daoyu_ra_saved_ideology_ideology_modernizer_leader_ra set_ideology = ideology:ideology_modernizer_leader_ra }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_nazi } remove_variable = daoyu_ra_saved_ideology_ideology_nazi set_ideology = ideology:ideology_nazi }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_neo_absolutism_leader } remove_variable = daoyu_ra_saved_ideology_ideology_neo_absolutism_leader set_ideology = ideology:ideology_neo_absolutism_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_nordic_pan_nationalist } remove_variable = daoyu_ra_saved_ideology_ideology_nordic_pan_nationalist set_ideology = ideology:ideology_nordic_pan_nationalist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_polk_jingoist_leader } remove_variable = daoyu_ra_saved_ideology_ideology_polk_jingoist_leader set_ideology = ideology:ideology_polk_jingoist_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_progresista } remove_variable = daoyu_ra_saved_ideology_ideology_progresista set_ideology = ideology:ideology_progresista }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_sanminzhuyi } remove_variable = daoyu_ra_saved_ideology_ideology_sanminzhuyi set_ideology = ideology:ideology_sanminzhuyi }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_social_corporations } remove_variable = daoyu_ra_saved_ideology_ideology_social_corporations set_ideology = ideology:ideology_social_corporations }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_sonno_kaikoku } remove_variable = daoyu_ra_saved_ideology_ideology_sonno_kaikoku set_ideology = ideology:ideology_sonno_kaikoku }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_titoist } remove_variable = daoyu_ra_saved_ideology_ideology_titoist set_ideology = ideology:ideology_titoist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_trotskyist } remove_variable = daoyu_ra_saved_ideology_ideology_trotskyist set_ideology = ideology:ideology_trotskyist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_ultraleftist } remove_variable = daoyu_ra_saved_ideology_ideology_ultraleftist set_ideology = ideology:ideology_ultraleftist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_usfp_abolitionist_radical } remove_variable = daoyu_ra_saved_ideology_ideology_usfp_abolitionist_radical set_ideology = ideology:ideology_usfp_abolitionist_radical }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_usfp_georgist_leader } remove_variable = daoyu_ra_saved_ideology_ideology_usfp_georgist_leader set_ideology = ideology:ideology_usfp_georgist_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_usfp_pan_indianist } remove_variable = daoyu_ra_saved_ideology_ideology_usfp_pan_indianist set_ideology = ideology:ideology_usfp_pan_indianist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_usfp_progressive } remove_variable = daoyu_ra_saved_ideology_ideology_usfp_progressive set_ideology = ideology:ideology_usfp_progressive }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_usfp_progressive_movement } remove_variable = daoyu_ra_saved_ideology_ideology_usfp_progressive_movement set_ideology = ideology:ideology_usfp_progressive_movement }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_usfp_social_darwinist_leader } remove_variable = daoyu_ra_saved_ideology_ideology_usfp_social_darwinist_leader set_ideology = ideology:ideology_usfp_social_darwinist_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_usfp_social_gospel_leader } remove_variable = daoyu_ra_saved_ideology_ideology_usfp_social_gospel_leader set_ideology = ideology:ideology_usfp_social_gospel_leader }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_usfp_strongman_populist } remove_variable = daoyu_ra_saved_ideology_ideology_usfp_strongman_populist set_ideology = ideology:ideology_usfp_strongman_populist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_usfp_universalist } remove_variable = daoyu_ra_saved_ideology_ideology_usfp_universalist set_ideology = ideology:ideology_usfp_universalist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_venizelist } remove_variable = daoyu_ra_saved_ideology_ideology_venizelist set_ideology = ideology:ideology_venizelist }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ideology_venizelos } remove_variable = daoyu_ra_saved_ideology_ideology_venizelos set_ideology = ideology:ideology_venizelos }
+	if = { limit = { has_variable = daoyu_ra_saved_ideology_ra_ideology_jingshi_republicanism } remove_variable = daoyu_ra_saved_ideology_ra_ideology_jingshi_republicanism set_ideology = ideology:ra_ideology_jingshi_republicanism }
+}
+
 daoyu_ra_invite_agitator_effect = {
 	save_scope_as = daoyu_ra_mv_character
 	add_career_length = { role = agitator months = 60 random_range = { 1.0 1.5 } }
-	scope:actor = {
+	# 1) 临时换成保底意识形态，让 can_agitate 成立（否则部分角色邀请无效）
+	daoyu_ra_save_ideology_effect = yes
+	# 2) 鼓动者槽位不足时临时补 1 个
+	scope:daoyu_ra_mv_country = {
 		if = { limit = { empty_agitator_slots < 1 } add_modifier = { name = daoyu_country_agitator_slots_add days = 30 } }
 	}
-	transfer_character = scope:actor
+	# 3) 直接搬角色（无视原版 cooldown / can_agitate）
+	transfer_character = scope:daoyu_ra_mv_country
 	set_variable = { name = daoyu_ra_invited_var days = 90 }
 	free_from_exile_effect = yes
-	scope:actor = { daoyu_ra_create_suitable_movement_effect = yes }
+	# 4) 立刻还原意识形态。
+	#
+	#    【为什么可以立即还原，不需要延迟】
+	#    脚本效果是**顺序同步执行**的：can_agitate 只在交互的 possible 里被求值一次，
+	#    而那时（本效果开始之前）保底意识形态已经在角色身上了，判定已经通过。
+	#    效果链本身不会再重新求值一次「能不能鼓动」。
+	#    反证：vanilla invite_exile 自己的顺序就是
+	#      transfer_character -> set_variable -> add_career_length -> free_from_exile_effect，
+	#    而 free_from_exile_effect 里的 character_traditionalist_switch_effect 会
+	#    当场 set_ideology 覆盖掉意识形态 —— 它照样工作，说明没有「延迟重判」这回事。
+	#
+	#    【曾经的 bug】最初把「待还原的角色」存在**国家变量**上，
+	#    连续邀请第二个人时会覆盖掉第一个人，前一个角色的临时意识形态
+	#    永远还原不回去。现在直接对**本人**立即还原，不经过任何中间变量，
+	#    因此不存在覆盖问题，也不需要延迟或兜底事件。
+	daoyu_ra_restore_ideology_effect = yes
 }
 
 #---------------------------------------------------------------------------
-# 【转职】政治家 / 指挥官 -> 鼓动者
-# 先检查鼓动者槽位，不足则临时补 1 个，再做职位切换（replace_character_roles）。
-# 调用作用域：this = 目标角色，scope:actor = 玩家国。
+# 【转职】政治家 / 指挥官 -> 鼓动者（职位切换 + 鼓动者岗位检查）
+# 调用作用域：this = 目标角色，scope:daoyu_ra_mv_country = 玩家国
 #---------------------------------------------------------------------------
 daoyu_ra_convert_to_agitator_effect = {
-	save_scope_as = daoyu_ra_mv_character
-	scope:actor = {
+	scope:daoyu_ra_mv_country = {
 		if = { limit = { empty_agitator_slots < 1 } add_modifier = { name = daoyu_country_agitator_slots_add days = 30 } }
 	}
-	if = { limit = { is_in_exile_pool = yes } transfer_character = scope:actor }
+	if = { limit = { is_in_exile_pool = yes } transfer_character = scope:daoyu_ra_mv_country }
 	if = { limit = { is_in_exile_pool = yes } free_from_exile_effect = yes }
 	replace_character_roles = { remove = { politician general admiral } add = { agitator } }
 	add_career_length = { role = agitator months = 60 random_range = { 1.0 1.5 } }
-	scope:actor = { daoyu_ra_create_suitable_movement_effect = yes }
 }
 
 #---------------------------------------------------------------------------
 # 【招募】让角色担任政府职位（政治家 / 将领 / 提督）
-# 招募 = 政府职位，与「邀请」严格区分。对应原版 replace_character_roles 效果。
-# 调用作用域：this = 目标角色，scope:actor = 招募国，$ROLE$ = politician/general/admiral。
+# 招募 = 政府职位，与「邀请」严格区分。
+# 调用作用域：this = 目标角色，scope:daoyu_ra_mv_country = 招募国，$ROLE$ = 职位
 #---------------------------------------------------------------------------
-daoyu_ra_recruit_role_effect = {
-	if = { limit = { is_in_exile_pool = yes } transfer_character = scope:actor }
+# 【招募】让角色担任政府职位
+# 招募 = 政府职位，与「邀请」严格区分。
+#
+# 【重要】为什么拆成三个独立效果而不是用 $ROLE$ 参数：
+#   replace_character_roles 里的角色名必须是**裸标识符**（如 general）。
+#   曾经写成 add = { $ROLE$ } 并以 ROLE = "politician" 传入，代入后变成
+#   add = { "politician" } —— 角色名解析失败，且引擎**不报错**、效果静默失败，
+#   表现就是「点了招募按钮完全没反应」。
+#   而用 if = { limit = { $ROLE$ = politician } ... } 做分支也不行，
+#   代入后会变成裸标识符比较 politician = politician，同样不是合法触发。
+#   所以这里直接拆成三个效果，角色名全部裸写，零字符串代入。
+#
+# 调用作用域：this = 角色；scope:daoyu_ra_mv_country = 招募国
+#---------------------------------------------------------------------------
+daoyu_ra_recruit_common_effect = {
+	if = { limit = { is_in_exile_pool = yes } transfer_character = scope:daoyu_ra_mv_country }
 	if = { limit = { is_in_exile_pool = yes } free_from_exile_effect = yes }
-	replace_character_roles = { remove = { agitator } add = { $ROLE$ } }
+}
+
+daoyu_ra_recruit_politician_effect = {
+	daoyu_ra_recruit_common_effect = yes
+	replace_character_roles = { remove = { agitator } add = { politician } }
+}
+
+daoyu_ra_recruit_general_effect = {
+	daoyu_ra_recruit_common_effect = yes
+	replace_character_roles = { remove = { agitator } add = { general } }
+}
+
+daoyu_ra_recruit_admiral_effect = {
+	daoyu_ra_recruit_common_effect = yes
+	replace_character_roles = { remove = { agitator } add = { admiral } }
+}
+
+
+#---------------------------------------------------------------------------
+# 管理角色界面里的三个入口
+# 调用作用域：this = 玩家国（事件 / 交互已把角色存进 daoyu_ra_mv_character）
+#---------------------------------------------------------------------------
+# 转职为鼓动者
+daoyu_ra_mv_convert_effect = {
+	save_scope_as = daoyu_ra_mv_country
+	# 注意：has_role_of_type 必须作用在角色上，故在 var: 块内调用
+	var:daoyu_ra_mv_character ?= {
+		if = { limit = { not = { has_role_of_type = agitator } } daoyu_ra_convert_to_agitator_effect = yes }
+	}
+}
+
+# 指定政治运动：非鼓动者先自动转职，再打开运动选择菜单
+daoyu_ra_mv_enter_effect = {
+	save_scope_as = daoyu_ra_mv_country
+	var:daoyu_ra_mv_character ?= {
+		if = { limit = { not = { has_role_of_type = agitator } } daoyu_ra_convert_to_agitator_effect = yes }
+		save_scope_as = daoyu_target_character
+	}
+	daoyu_ra_open_movement_menu_effect = yes
+}
+
+# 招募为政府职位
+# 管理角色界面：把角色从国家变量取回，再交给对应职位的效果
+daoyu_ra_mv_recruit_politician_effect = {
+	save_scope_as = daoyu_ra_mv_country
+	var:daoyu_ra_mv_character ?= { daoyu_ra_recruit_politician_effect = yes }
+}
+daoyu_ra_mv_recruit_general_effect = {
+	save_scope_as = daoyu_ra_mv_country
+	var:daoyu_ra_mv_character ?= { daoyu_ra_recruit_general_effect = yes }
+}
+daoyu_ra_mv_recruit_admiral_effect = {
+	save_scope_as = daoyu_ra_mv_country
+	var:daoyu_ra_mv_character ?= { daoyu_ra_recruit_admiral_effect = yes }
+}
+
+#---------------------------------------------------------------------------
+# 成为利益集团领袖（v1.0.0 功能二，保留）
+# 调用作用域：this = 国家，scope:daoyu_target_character = 角色
+#---------------------------------------------------------------------------
+daoyu_ra_set_ig_leader_effect = {
+	scope:daoyu_target_character ?= { set_as_interest_group_leader = yes }
 }

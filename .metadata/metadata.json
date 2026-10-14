@@ -1,11 +1,11 @@
 {
   "name": "Daoyu Cheat - Real History Compatibility",
   "id": "daoyu_cheat_ra",
-  "version": "1.2.1",
+  "version": "1.2.7",
   "game_id": "victoria3",
   "picture": "thumbnail.png",
   "supported_game_version": "1.13.*",
-  "short_description": "Compatibility patch for Daoyu Cheat and Realism Ai Historical Flavor Mod: full RA law and ideology menus, exile-pool character cheat options, invite/recruit/convert agitators and assign political movements.",
+  "short_description": "Compatibility patch for Daoyu Cheat and Realism Ai Historical Flavor Mod: full RA law and ideology menus, three exile right-click actions (instant invite, arrange accident, manage character), and single-character personnel actions inside the manage-character menu.",
   "tags": [
     "Events"
   ],

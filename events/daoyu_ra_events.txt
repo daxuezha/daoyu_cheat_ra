@@ -4,23 +4,32 @@
 #
 # 事件 ID：daoyu.292（基础 Mod 未占用；.290 / .291 已被占用）
 #
-# 用途：为鼓动者指定其可以参加的政治运动。
+# 用途：为**单个**角色指定其可以参加的政治运动。
 #
-# 引擎能力边界（本功能的设计依据）：
-#   引擎不存在「把角色指派到某个政治运动」的脚本效果。可用命令只有
-#   create_political_movement / bolster_political_movement / suppress_political_movement，
-#   全部以国家为作用域；角色侧只有只读的 character_supports_political_movement。
-#   角色的运动归属由引擎按 political_movements 定义中的 character_support_trigger 自动判定。
+# 作用域约定：
+#   本事件为 country_event，this = 玩家国。
+#   目标角色由玩家国的变量 daoyu_ra_mv_character 传入，在 immediate 中解析为
+#   scope:daoyu_target_character。分页重开事件时该变量保留，因此翻页不会丢目标。
 #
-#   因此本菜单提供两种做法：
-#     1)「自动匹配」：按角色当前意识形态，在其所属国创建相配的运动；
-#     2)「手动指定」：直接选定运动类型创建，角色可参加的运动随之确定。
-#   两者都让目标国出现与角色相配的运动，角色即会自动参加 / 支持它。
+# 【重要】为什么只改目标角色的意识形态
+#   引擎没有「把角色指派到政治运动」的接口，角色的运动归属由引擎按
+#   common/political_movements/*.txt 里的 character_support_trigger 自动判定。
+#   所以本菜单的做法是：
+#     1) 在目标国创建该类型的运动（已存在则直接沿用）；
+#     2) 只把**目标角色**的意识形态改成该运动 character_support_trigger 所认可的
+#        那一个 —— 见脚本效果 daoyu_ra_mv_apply_ideology_effect。
+#   绝不批量修改角色意识形态，否则会把本国其他角色一起卷进该运动。
 #
-# 作用域说明：
-#   本事件为 country_event，触发者即玩家国；this = 玩家国。
-#   角色由国家变量 daoyu_ra_mv_target 传入，在 immediate 中解析为
-#   scope:daoyu_target_character（与基础 Mod 其他菜单保持一致）。
+# 分页：45 种运动，每页 15 种，共 3 页。
+#   结构与基础 Mod 的意识形态菜单（daoyu.250）保持一致：
+#     · 「上一页」放在列表最前面，第 1 页时不显示；
+#     · 「下一页」放在列表最后面，第 3 页时不显示；
+#     · 「退出」只有一个，用原版已有的 RESIGN；
+#   翻页由脚本效果 daoyu_ra_mv_page_prev / _next 移动页标记后重开本事件实现。
+#
+# 【易错提醒】选项的显示条件必须写 trigger，不能写成 ai_chance。
+#   曾经误把 ai_chance = { base = 100 } 当显示条件，导致「退出」在每页都渲染、
+#   出现三个退出按钮，且点到假按钮时只清了页标记却不关界面。
 ###############################################################################
 namespace = daoyu
 
@@ -41,546 +50,459 @@ daoyu.292 = {
 	icon = "gfx/interface/icons/event_icons/event_trade.dds"
 	duration = 0
 	immediate = {
-		# 事件国家即玩家国（本事件由玩家国触发）
 		save_scope_as = daoyu_target_country
-		# 从国家变量取回目标角色
-		var:daoyu_ra_mv_target ?= { save_scope_as = daoyu_target_character }
+		var:daoyu_ra_mv_character ?= { save_scope_as = daoyu_target_character }
+		if = { limit = { nor = { has_variable = daoyu_ra_mv_page_01 has_variable = daoyu_ra_mv_page_02 has_variable = daoyu_ra_mv_page_03 } } set_variable = daoyu_ra_mv_page_01 }
 	}
 
-	# 自动匹配：按角色当前意识形态创建相配的运动
+
+	# ================= 第 1 / 3 页（15 种运动） =================
+	# 自动匹配：按目标角色当前意识形态创建相配的运动，并保证其可参加
 	option = {
 		name = daoyu_ra_mv_auto
-		trigger = { exists = scope:daoyu_target_character }
-		scope:daoyu_target_character = { save_scope_as = daoyu_ra_mv_character }
-		daoyu_ra_create_suitable_movement_effect = yes
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-
-	# ===== 意识形态 =====
-	option = {
-		name = movement_socialist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_socialist } }
-		}
-		create_political_movement = {
-			type = movement_socialist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_communist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_communist } }
-		}
-		create_political_movement = {
-			type = movement_communist
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_01 exists = scope:daoyu_target_character }
+		daoyu_ra_mv_auto_effect = yes
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_anarchist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_anarchist } }
-		}
-		create_political_movement = {
-			type = movement_anarchist
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_anarchist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_anarchist } } } create_political_movement = { type = movement_anarchist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_anarchist" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
-		name = movement_fascist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_fascist } }
-		}
-		create_political_movement = {
-			type = movement_fascist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_corporatist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_corporatist } }
-		}
-		create_political_movement = {
-			type = movement_corporatist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_labor
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_labor } }
-		}
-		create_political_movement = {
-			type = movement_labor
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_liberal
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_liberal } }
-		}
-		create_political_movement = {
-			type = movement_liberal
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_radical
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_radical } }
-		}
-		create_political_movement = {
-			type = movement_radical
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_nihilist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_nihilist } }
-		}
-		create_political_movement = {
-			type = movement_nihilist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_positivist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_positivist } }
-		}
-		create_political_movement = {
-			type = movement_positivist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_utilitarian
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_utilitarian } }
-		}
-		create_political_movement = {
-			type = movement_utilitarian
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_land_reform
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_land_reform } }
-		}
-		create_political_movement = {
-			type = movement_land_reform
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_modernizer
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_modernizer } }
-		}
-		create_political_movement = {
-			type = movement_modernizer
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_feminist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_feminist } }
-		}
-		create_political_movement = {
-			type = movement_feminist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_minority_rights
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_minority_rights } }
-		}
-		create_political_movement = {
-			type = movement_minority_rights
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_reactionary
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_reactionary } }
-		}
-		create_political_movement = {
-			type = movement_reactionary
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-
-	# ===== 君主派系 =====
-	option = {
-		name = movement_royalist_absolutist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_royalist_absolutist } }
-		}
-		create_political_movement = {
-			type = movement_royalist_absolutist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_royalist_constitutional
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_royalist_constitutional } }
-		}
-		create_political_movement = {
-			type = movement_royalist_constitutional
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_orleanist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_orleanist } }
-		}
-		create_political_movement = {
-			type = movement_orleanist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_legitimist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_legitimist } }
-		}
-		create_political_movement = {
-			type = movement_legitimist
-		}
+		name = movement_anti_slavery
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_abolitionist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_anti_slavery } } } create_political_movement = { type = movement_anti_slavery } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_anti_slavery" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_bonapartist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_bonapartist } }
-		}
-		create_political_movement = {
-			type = movement_bonapartist
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_bonapartist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_bonapartist } } } create_political_movement = { type = movement_bonapartist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_bonapartist" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_carlist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_carlist } }
-		}
-		create_political_movement = {
-			type = movement_carlist
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_traditionalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_carlist } } } create_political_movement = { type = movement_carlist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_carlist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_communist
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_vanguardist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_communist } } } create_political_movement = { type = movement_communist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_communist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_corporatist
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_corporatist_leader
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_corporatist } } } create_political_movement = { type = movement_corporatist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_corporatist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_fascist
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_fascist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_fascist } } } create_political_movement = { type = movement_fascist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_fascist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_feminist
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_feminist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_feminist } } } create_political_movement = { type = movement_feminist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_feminist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_labor
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_reformer
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_labor } } } create_political_movement = { type = movement_labor } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_labor" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_land_reform
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_land_reformer
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_land_reform } } } create_political_movement = { type = movement_land_reform } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_land_reform" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_legitimist
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_legitimist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_legitimist } } } create_political_movement = { type = movement_legitimist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_legitimist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_liberal
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_market_liberal
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_liberal } } } create_political_movement = { type = movement_liberal } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_liberal" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_meiji_restorationist
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_reformer
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_meiji_restorationist } } } create_political_movement = { type = movement_meiji_restorationist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_meiji_restorationist" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_miguelist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_miguelist } }
-		}
-		create_political_movement = {
-			type = movement_miguelist
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_traditionalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_miguelist } } } create_political_movement = { type = movement_miguelist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_miguelist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_minority_rights
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		# 目标角色需改为：ideology_humanitarian
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_minority_rights } } } create_political_movement = { type = movement_minority_rights } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_minority_rights" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = NEXT_PAGE#下一页
+		trigger = { has_variable = daoyu_ra_mv_page_01 }
+		daoyu_ra_mv_page_next = yes
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 
-	# ===== 宗教 =====
+	# ================= 第 2 / 3 页（15 种运动） =================
 	option = {
-		name = movement_religious_majority
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_religious_majority } }
-		}
-		create_political_movement = {
-			type = movement_religious_majority
-			religion = scope:daoyu_target_character.religion
-		}
+		name = PREVIOUS_PAGE#上一页
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		daoyu_ra_mv_page_prev = yes
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
-		name = movement_religious_minority
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_religious_minority } }
-		}
-		create_political_movement = {
-			type = movement_religious_minority
-			religion = scope:daoyu_target_character.religion
-		}
+		name = movement_modernizer
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_reformer
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_modernizer } } } create_political_movement = { type = movement_modernizer } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_modernizer" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
-		name = movement_muslim_nationalist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_muslim_nationalist } }
-		}
-		create_political_movement = {
-			type = movement_muslim_nationalist
-			religion = scope:daoyu_target_character.religion
-		}
+		name = movement_nihilist
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_nihilist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_nihilist } } } create_political_movement = { type = movement_nihilist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_nihilist" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
-		name = movement_hindu_nationalist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_hindu_nationalist } }
-		}
-		create_political_movement = {
-			type = movement_hindu_nationalist
-			religion = scope:daoyu_target_character.religion
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-
-	# ===== 文化民族 =====
-	option = {
-		name = movement_cultural_majority
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_cultural_majority } }
-		}
-		create_political_movement = {
-			type = movement_cultural_majority
-			culture = scope:daoyu_target_character.culture
-		}
+		name = movement_orleanist
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_orleanist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_orleanist } } } create_political_movement = { type = movement_orleanist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_orleanist" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
-		name = movement_cultural_minority
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_cultural_minority } }
-		}
-		create_political_movement = {
-			type = movement_cultural_minority
-			culture = scope:daoyu_target_character.culture
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_italian_national
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_italian_national } }
-		}
-		create_political_movement = {
-			type = movement_italian_national
-			culture = scope:daoyu_target_character.culture
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_german_national
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_german_national } }
-		}
-		create_political_movement = {
-			type = movement_german_national
-			culture = scope:daoyu_target_character.culture
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_yugoslav_national
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_yugoslav_national } }
-		}
-		create_political_movement = {
-			type = movement_yugoslav_national
-			culture = scope:daoyu_target_character.culture
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_india_pan_national
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_india_pan_national } }
-		}
-		create_political_movement = {
-			type = movement_india_pan_national
-			culture = scope:daoyu_target_character.culture
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_dominican_national
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_dominican_national } }
-		}
-		create_political_movement = {
-			type = movement_dominican_national
-			culture = scope:daoyu_target_character.culture
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-
-	# ===== 奴隶制 =====
-	option = {
-		name = movement_anti_slavery
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_anti_slavery } }
-		}
-		create_political_movement = {
-			type = movement_anti_slavery
-		}
+		name = movement_positivist
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_positivist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_positivist } } } create_political_movement = { type = movement_positivist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_positivist" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_pro_slavery
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_pro_slavery } }
-		}
-		create_political_movement = {
-			type = movement_pro_slavery
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_slave_revolt
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_slave_revolt } }
-		}
-		create_political_movement = {
-			type = movement_slave_revolt
-			culture = scope:daoyu_target_character.culture
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-
-	# ===== 日本主题 =====
-	option = {
-		name = movement_meiji_restorationist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_meiji_restorationist } }
-		}
-		create_political_movement = {
-			type = movement_meiji_restorationist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-	option = {
-		name = movement_tokugawa_loyalist
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_tokugawa_loyalist } }
-		}
-		create_political_movement = {
-			type = movement_tokugawa_loyalist
-		}
-		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
-	}
-
-	# ===== RA 追加 =====
-	option = {
-		name = movement_scandinavia_pan_national
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_scandinavia_pan_national } }
-		}
-		create_political_movement = {
-			type = movement_scandinavia_pan_national
-			culture = scope:daoyu_target_character.culture
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_slaver
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_pro_slavery } } } create_political_movement = { type = movement_pro_slavery } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_pro_slavery" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_progresista
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_progresista } }
-		}
-		create_political_movement = {
-			type = movement_progresista
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_market_liberal
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_progresista } } } create_political_movement = { type = movement_progresista } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_progresista" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_radical
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_radical
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_radical } } } create_political_movement = { type = movement_radical } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_radical" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_reactionary
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_traditionalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_reactionary } } } create_political_movement = { type = movement_reactionary } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_reactionary" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_royalist_absolutist
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_royalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_royalist_absolutist } } } create_political_movement = { type = movement_royalist_absolutist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_royalist_absolutist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_royalist_constitutional
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_royalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_royalist_constitutional } } } create_political_movement = { type = movement_royalist_constitutional } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_royalist_constitutional" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_socialist
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_communist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_socialist } } } create_political_movement = { type = movement_socialist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_socialist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_tokugawa_loyalist
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_authoritarian
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_tokugawa_loyalist } } } create_political_movement = { type = movement_tokugawa_loyalist } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_tokugawa_loyalist" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_usfp_american_constitution
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_usfp_american_constitution } }
-		}
-		create_political_movement = {
-			type = movement_usfp_american_constitution
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_republican_leader
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_usfp_american_constitution } } } create_political_movement = { type = movement_usfp_american_constitution } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_usfp_american_constitution" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_usfp_eugenics
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_usfp_eugenics } }
-		}
-		create_political_movement = {
-			type = movement_usfp_eugenics
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_usfp_social_darwinist_leader
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_usfp_eugenics } } } create_political_movement = { type = movement_usfp_eugenics } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_usfp_eugenics" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_usfp_neoconfederate
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_usfp_neoconfederate } }
-		}
-		create_political_movement = {
-			type = movement_usfp_neoconfederate
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		# 目标角色需改为：ideology_ethno_nationalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_usfp_neoconfederate } } } create_political_movement = { type = movement_usfp_neoconfederate } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_usfp_neoconfederate" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = NEXT_PAGE#下一页
+		trigger = { has_variable = daoyu_ra_mv_page_02 }
+		daoyu_ra_mv_page_next = yes
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+
+	# ================= 第 3 / 3 页（15 种运动） =================
+	option = {
+		name = PREVIOUS_PAGE#上一页
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		daoyu_ra_mv_page_prev = yes
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
 	option = {
 		name = movement_usfp_progressive
-		trigger = {
-			exists = scope:daoyu_target_character
-			not = { any_political_movement = { is_political_movement_type = movement_usfp_progressive } }
-		}
-		create_political_movement = {
-			type = movement_usfp_progressive
-		}
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_usfp_progressive
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_usfp_progressive } } } create_political_movement = { type = movement_usfp_progressive } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_usfp_progressive" }
 		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
 	}
-
-	# 退出
+	option = {
+		name = movement_utilitarian
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_utilitarian_leader
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_utilitarian } } } create_political_movement = { type = movement_utilitarian } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_utilitarian" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_dominican_national
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_republican_leader
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_dominican_national } } } create_political_movement = { type = movement_dominican_national } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_dominican_national" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_german_national
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_ethno_nationalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_german_national } } } create_political_movement = { type = movement_german_national } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_german_national" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_india_pan_national
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_sovereignist_leader
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_india_pan_national } } } create_political_movement = { type = movement_india_pan_national } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_india_pan_national" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_italian_national
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_ethno_nationalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_italian_national } } } create_political_movement = { type = movement_italian_national } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_italian_national" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_scandinavia_pan_national
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_nordic_pan_nationalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_scandinavia_pan_national } } } create_political_movement = { type = movement_scandinavia_pan_national } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_scandinavia_pan_national" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_yugoslav_national
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_ethno_nationalist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_yugoslav_national } } } create_political_movement = { type = movement_yugoslav_national } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_yugoslav_national" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_cultural_minority
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_humanitarian
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_cultural_minority } } }
+			create_political_movement = {
+				type = movement_cultural_minority
+				culture = scope:daoyu_target_character.culture
+			}
+		}
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_cultural_minority" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_slave_revolt
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_abolitionist
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_slave_revolt } } }
+			create_political_movement = {
+				type = movement_slave_revolt
+				culture = scope:daoyu_target_character.culture
+			}
+		}
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_slave_revolt" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_cultural_majority
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_fascist
+		if = { limit = { not = { any_political_movement = { is_political_movement_type = movement_cultural_majority } } } create_political_movement = { type = movement_cultural_majority } }
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_cultural_majority" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_hindu_nationalist
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_theocrat
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_hindu_nationalist } } }
+			create_political_movement = {
+				type = movement_hindu_nationalist
+				religion = scope:daoyu_target_character.religion
+			}
+		}
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_hindu_nationalist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_muslim_nationalist
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_theocrat
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_muslim_nationalist } } }
+			create_political_movement = {
+				type = movement_muslim_nationalist
+				religion = scope:daoyu_target_character.religion
+			}
+		}
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_muslim_nationalist" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_religious_majority
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_traditionalist
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_religious_majority } } }
+			create_political_movement = {
+				type = movement_religious_majority
+				religion = scope:daoyu_target_character.religion
+			}
+		}
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_religious_majority" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
+	option = {
+		name = movement_religious_minority
+		trigger = { has_variable = daoyu_ra_mv_page_03 }
+		# 目标角色需改为：ideology_traditionalist
+		if = {
+			limit = { not = { any_political_movement = { is_political_movement_type = movement_religious_minority } } }
+			create_political_movement = {
+				type = movement_religious_minority
+				religion = scope:daoyu_target_character.religion
+			}
+		}
+		daoyu_ra_mv_apply_ideology_effect = { MOVEMENT = "movement_religious_minority" }
+		hidden_effect = { trigger_event = { id = daoyu.292 popup = yes } }
+	}
 	option = {
 		name = RESIGN
 		ai_chance = { base = 100 }
+		daoyu_ra_mv_page_exit = yes
+		# 【必须】标记要返回上一层。管理角色（daoyu.220）的清理逻辑
+		# （移除 daoyu_target_character 标签、清 daoyu_character_interactions 全局变量）
+		# 只在它自己的退出选项里执行；如果这里直接结束事件，
+		# 那些状态会一直挂着，导致后续刀鱼菜单全部失效。
+		set_variable = daoyu_return
+	}
+	after = {
+		if = {
+			limit = { has_variable = daoyu_return }
+			remove_variable = daoyu_return
+			hidden_effect = { trigger_event = { id = daoyu.220 popup = yes } }
+		}
 	}
 }
