@@ -3379,6 +3379,22 @@ daoyu.220 = {
 		save_scope_as = daoyu_ra_mv_country
 		daoyu_ra_assign_movement_effect = yes
 	}
+	#【兼容补丁新增】成为利益集团领袖：参考原版 set_as_interest_group_leader 与 real_history 的 roc_republic2 决议
+	option = {
+		name = daoyu_set_character_as_ig_leader#成为利益集团领袖
+		trigger = {
+			exists = scope:daoyu_target_character
+			exists = scope:daoyu_target_character.interest_group
+			scope:daoyu_target_character = {
+				has_trait = daoyu_target_character
+				is_character_alive = yes
+				is_in_exile_pool = no
+				is_interest_group_leader = no
+			}
+		}
+		set_global_variable = daoyu_set_character_as_ig_leader
+		hidden_effect = { trigger_event = { id = daoyu.222 popup = yes } }
+	}
 	option = {
 		name = SET_CHARACTER_AS_RULER#成为统治者
 		trigger = { exists = scope:daoyu_target_character scope:daoyu_target_character = { is_ruler = no not = { has_role_of_type = executive } has_trait = daoyu_target_character } }
@@ -3559,6 +3575,7 @@ daoyu.222 = {
 	flavor = {
 		first_valid = { desc = daoyu_target_character_get_name }
 		first_valid = { triggered_desc = { trigger = { has_global_variable = daoyu_set_character_as_ruler } } desc = SET_CHARACTER_AS_RULER }
+		first_valid = { triggered_desc = { trigger = { has_global_variable = daoyu_set_character_as_ig_leader } } desc = daoyu_set_character_as_ig_leader }
 		first_valid = { triggered_desc = { trigger = { has_global_variable = daoyu_exile_character } } desc = oncept_exile }
 	}
 	event_image = { video = "gfx/event_pictures/europenorthamerica_capitalists_meeting.bk2" }
@@ -3569,6 +3586,11 @@ daoyu.222 = {
 	immediate = {
 		random_country = { limit = { has_variable = daoyu_target_country } save_scope_as = daoyu_target_country }
 		if = { limit = { any_character_in_exile_pool = { has_trait = daoyu_target_character } } random_character_in_exile_pool = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } } else = { random_character = { limit = { has_trait = daoyu_target_character } save_scope_as = daoyu_target_character } }
+	}
+	option = {
+		name = CONFIRM
+		trigger = { has_global_variable = daoyu_set_character_as_ig_leader exists = scope:daoyu_target_character exists = scope:daoyu_target_character.interest_group scope:daoyu_target_character = { has_trait = daoyu_target_character } }
+		scope:daoyu_target_character = { set_as_interest_group_leader = yes }
 	}
 	option = {
 		name = CONFIRM
@@ -3585,6 +3607,7 @@ daoyu.222 = {
 		default_option = yes
 	}
 	after = {
+		remove_global_variable = daoyu_set_character_as_ig_leader
 		remove_global_variable = daoyu_set_character_as_ruler
 		remove_global_variable = daoyu_exile_character
 		trigger_event = { id = daoyu.220 popup = yes }

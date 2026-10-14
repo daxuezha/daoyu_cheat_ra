@@ -244,6 +244,11 @@ daoyu_cheat_ra/
 
 - `events/daoyu_events.txt`
   - `daoyu.220`：在「成为统治者」选项**之前**新增「成为利益集团领袖」选项，设置全局变量 `daoyu_set_character_as_ig_leader` 并转入确认事件 `daoyu.222`。
+
+> ⚠️ **回归提醒**：该选项来自 v1.0.0。v1.1.0 开发「指定政治运动」时，因为两者的选项都插在 `daoyu.220` 的同一位置，
+> 曾把「成为利益集团领袖」选项**连同 `daoyu.222` 的确认分支 / 提示行 / 变量清理一起误删**。
+> v1.2.1 已完整恢复，并在校验脚本中加入**回归守卫**（见「已完成的静态检查 → 回归守卫」），
+> 后续修改 `daoyu.220` 附近区域时请务必运行。
   - `daoyu.222`：`flavor` 增加对应描述分支；新增一个 `CONFIRM` 选项执行 `scope:daoyu_target_character = { set_as_interest_group_leader = yes }`；`after` 清理新变量。
 - `localization/<语言>/daoyu_ra_l_<语言>.yml`（11 种语言）：新增键 `daoyu_set_character_as_ig_leader`，与基础 Mod 的本地化覆盖方式一致。
 
@@ -564,7 +569,7 @@ Victoria 3 的 `INJECT:` / `TRY_INJECT:` / `REPLACE_OR_CREATE:` 只对 `common/`
   |---|---|---|---|---|
   | `common/scripted_triggers/daoyu_triggers.txt` | 2641 | 2720 | 79 | **0** |
   | `common/character_interactions/daoyu_character_interactions.txt` | 323 | 441 | 119 | 1（等价替换） |
-  | `events/daoyu_events.txt` | 14262 | 14326 | 76 | 12（等价替换） |
+  | `events/daoyu_events.txt` | 14262 | 14349 | 99 | 12（等价替换） |
   | `common/scripted_effects/daoyu_effects.txt` | 2209 | 2516 | 310 | 3（等价替换） |
 
 - 上述「删除行」均为**等价替换**，语义等价或更强，不是功能丢失：
@@ -600,6 +605,25 @@ Victoria 3 的 `INJECT:` / `TRY_INJECT:` / `REPLACE_OR_CREATE:` 只对 `common/`
 - 6 个新交互全部**不含 `icon =`**，与基础 Mod 既有 7 个交互一致（基础 Mod 中 `icon =` 出现 0 次）。
 - 新事件 ID `daoyu.292` 与基础 Mod 全部事件 ID（含 `daoyu_events.txt`、`daoyu_long_events.txt`、
   `daoyu_tec_and_law_events.txt`、`btking_events.txt`）无冲突（`.290` / `.291` 已被占用，已避开）。
+
+### 回归守卫
+
+`daoyu.220` 的选项区域是**易冲突区**（多个功能都把选项插在「成为统治者」附近），
+因此校验脚本对以下不变量做硬性检查，任何一项失败都必须先修好再提交：
+
+| 守卫项 | 检查内容 |
+|---|---|
+| 功能二仍存在 | `daoyu.220` 含 `name = daoyu_set_character_as_ig_leader#成为利益集团领袖` |
+| 确认分支仍存在 | `daoyu.222` 含 `scope:daoyu_target_character = { set_as_interest_group_leader = yes }` |
+| 提示行仍存在 | `daoyu.222` 的 `flavor` 含 `has_global_variable = daoyu_set_character_as_ig_leader` |
+| 变量仍被清理 | `daoyu.222` 的 `after` 含 `remove_global_variable = daoyu_set_character_as_ig_leader` |
+| 意识形态菜单用专属分页 | `daoyu.250` 含 `daoyu_ra_check_page_next_ci = yes` |
+| 未误改共用分页 | 「利益集团意识形态」菜单仍用基础 Mod 的 `daoyu_check_page_next` |
+| 未新增 GUI 覆盖 | 仓库内不存在 `gui/` 目录 |
+| 按钮无图标 | 新交互文件中不出现 `icon = ` |
+
+此外，每次提交前应对**每个被覆盖的上游文件**按唯一行做一次 `Counter` 差分，
+确认「减少的行」全部在 README 的等价替换表中登记过——本次的回归正是这样发现的。
 
 ### 尚未验证
 
